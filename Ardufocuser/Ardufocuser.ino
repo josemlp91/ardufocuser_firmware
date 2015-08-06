@@ -1,5 +1,5 @@
 
-#define DEBUG 1
+#define DEBUG 0
 
 #include <TimerOne.h>
 #include <LiquidCrystal.h>
@@ -451,7 +451,7 @@ void serialParser(char delimiter) {
               if (c!= delimiter) command[i]=c;
               
         }
-        
+
         int a=0;
          // Volcamos contenido del buffer en el contenedor del dato.  
         for (i; (i<byteCount) ; i++){
@@ -602,7 +602,7 @@ void loop(){
   readTemperature();
   updateLCD();
   manualPerformance();
-  //sendCurrentposition();  
+  sendCurrentposition();  
   remoteManager(); 
 
 }
