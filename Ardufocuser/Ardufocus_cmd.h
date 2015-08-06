@@ -63,11 +63,11 @@ void ardufocuser_command_function_AMODE(){
 void ardufocuser_command_function_AG(){
 	int Ipar=atoi(data);
     motor.moveTo(Ipar); 
-    if (DEBUG) { Serial.println(motor.currentposition());  } 
+    if (DEBUG) { Serial.println(motor.currentPosition());  } 
 }
 
 void ardufocuser_command_function_APOSITION(){
-	String posA(motor.currentposition());
+	String posA(motor.currentPosition());
     sendMessageToIndi("APOSITION?"+posA);  
 }
 
@@ -116,7 +116,7 @@ void ardufocuser_command_function_AACC(){
 void ardufocuser_command_function_AR(){
 	int Ir=atoi(data);
       String r(Ir); 
-      motor.setCurrentposition(Ir);
+      motor.setCurrentPosition(Ir);
       sendMessageToIndi("AR?"+r);
 }
 
@@ -135,10 +135,6 @@ void ardufocuser_command_function_AMOV(){
 
 void ardufocuser_command_function_AMICRO(){
 	Serial.println("Ajusta micropasos");
-}
-
-void ardufocuser_command_function_AHLIMIT(){
-	Serial.println("Consultar si el enfocador ha llegado a un limite hardware.");
 }
 
 

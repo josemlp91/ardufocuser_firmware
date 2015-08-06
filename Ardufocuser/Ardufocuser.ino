@@ -5,10 +5,9 @@
 #include <LiquidCrystal.h>
 #include <AccelStepper.h>
 #include "Ardufocus_config.h"
-#include "Ardufocus_cmd.h"
+
 
 AccelStepper motor(1, PINSTEP, PINDIR);
-
 LiquidCrystal lcd(PINLCD_RS, PINLCD_ENABLE, PINLCD_D4, PINLCD_D5, PINLCD_D6, PINLCD_D7);
 
 
@@ -62,7 +61,7 @@ char buffer[bSize];     // buffer
 char command[bSize];    // almacenamos comando
 char data[bSize];       // almacenamos parametro
 
-
+#include "Ardufocus_cmd.h"
 
 /*
 * Funcion que lee los botones.
@@ -112,6 +111,8 @@ void finB(){ limitRunActiveB=true; }
 
 void timerFunction() { 
 
+  motor.run();
+  /*
   if (!limitRunActiveA and !limitRunActiveB){ 
   
       // Controlamos límites hardware para fines de carrera.
@@ -152,26 +153,33 @@ void timerFunction() {
     } else { motor.stop(); limitRunActiveB=true; }
 
   }
+  */
 }
 
 /*
 * Rutinas que actualiza los controles manuale, cuando pulsamos algun boton o actuamos sobre algun potenticometro.
 */
 void readManualController(){
-
+  int button2;
   // Para evitar sobrecargar la placa hacemos las lecturas dado un intervalo de tiempo.
-
   // Si ya se a cumplido el intervalo de tiempo, realizamos lectura.
   if (millis() > lastTimeReadButton + 5) {
     int adc_key = analogRead(PIN_BUTTON);
+    // Pare evitar rebotes estraños en la lectura de los botones,
+    // reliazamos dos lecturas, separadas por un delay
     button = read_LCD_buttons(adc_key);
-    
+    delay(200);   // Este delay debe ser lo suficiente para evitar el rebote y que mantenga la interectividad del contro.
+    button2 = read_LCD_buttons(adc_key);
+    if (button!=button2){button=btnNONE;}
+
     // Refrescamos momento de actualización.
     lastTimeReadButton = millis();
   }
 
   // Si no se cumple intervalo de tiempo, utilizamos el valor anterior.
-  else button=lastPulse;
+  else {
+    button=lastPulse;
+  }
 
 
   if (millis() > lastTimeReadController + 200) {
@@ -194,7 +202,7 @@ void readManualController(){
      }  
 
      if (abs(motor.speed() - speed ) > 2) {
-       motor.setMaxspeed(speed);
+       motor.setMaxSpeed(speed);
      }
 
      // Refrescamos momento de actualización. 
@@ -238,11 +246,11 @@ float readTemperature(){
 * Actualiza mensajes que se muestran por pantalla LCD. 
 */
 long lastTimeUpdateLcd = 0;
-void UpdateLCD(){
+void updateLCD(){
 
 
   // Si cumple el tiempo minimo de refresco.
-  if (millis() > lastTimeUpdateLcd + 500) {
+  if (millis() > lastTimeUpdateLcd + 15) {
 
     // Si ha cambiado el boton desde la última pulsación.
     if (button != lastPulse)  {
@@ -347,10 +355,10 @@ void manualPerformance(){
 
   //if (mode!=REMOTE){
   //motor.setAcceleration(DEF_ACC);   // Esta funcion no se puede ejecutar mucho
-  position=motor.currentposition();
+  position=motor.currentPosition();
 
   if (changeThermalOptical(temp_average, temp_perform)) enable_warning();
-      
+     
   switch (button){
 
     case btnNONE: {
@@ -358,45 +366,52 @@ void manualPerformance(){
                     if ((lastPulse==btnLEFT)||(lastPulse==btnRIGHT)){  
                       motor.stop(); 
                     }
-                   lastPulse=btnNONE; 
+                   lastPulse=btnNONE;
+                   
                    break;
       
     }
 
     case btnRIGHT: {
-                    motor.moveTo(motor.currentposition()-3000);
+                   
+                    motor.moveTo(motor.currentPosition()-3000);
                     lastPulse=btnRIGHT; 
+                    
                     break;
     }
 
     case btnLEFT:   {
-                      motor.moveTo(motor.currentposition()+3000); 
+                      motor.moveTo(motor.currentPosition()+3000); 
                       lastPulse=btnLEFT; 
+                     
                       break;
     }
 
     case btnUP:   {
                     if (lastPulse!=btnUP){
-                        motor.moveTo(motor.currentposition() + stepPerPulse);
+                        motor.moveTo(motor.currentPosition() + stepPerPulse);
                     }
                     
-                    lastPulse=btnUP;    
+                    lastPulse=btnUP;
+                     
                     break;
     }
 
     case btnDOWN: {
                     if (lastPulse!=btnDOWN){
-                        motor.moveTo(motor.currentposition() - stepPerPulse);
+                        motor.moveTo(motor.currentPosition() - stepPerPulse);
                     }
                     
-                    lastPulse=btnDOWN;  
+                    lastPulse=btnDOWN; 
+                    
                     break;
     }
 
     case btnSELECT: {
                       temp_perform=temp_average;
                       disable_warning();
-                      motor.setCurrentposition(0);     
+                      motor.setCurrentPosition(0);
+                           
                       break;
     }
 
@@ -511,26 +526,26 @@ void sendMessageToIndi(String message){
 */
 void driveCommandArdufocus(){
 
-  if      !(strcmp(command,allcmdArdu[AINIT]))       { ardufocuser_command_function_AINIT();     }
-  else if !(strcmp (command,allcmdArdu[AMODE]))      { ardufocuser_command_function_AMODE();     }
-  else if !(strcmp (command,allcmdArdu[AG]))         { ardufocuser_command_function_AG();        }
-  else if !(strcmp (command,allcmdArdu[APOSITION]))  { ardufocuser_command_function_APOSITION(); }
-  else if !(strcmp (command,allcmdArdu[ATEMP]))      { ardufocuser_command_function_ATEMP();     }
-  else if !(strcmp (command,allcmdArdu[ALTEMP]))     { ardufocuser_command_function_ALTEMP();    }
-  else if !(strcmp (command,allcmdArdu[AFINE]))      { ardufocuser_command_function_AFINE();     }
-  else if !(strcmp (command,allcmdArdu[ASPEED]))     { ardufocuser_command_function_ASPEED();    }
-  else if !(strcmp (command,allcmdArdu[AACC]))       { ardufocuser_command_function_AACC();      }
-  else if !(strcmp (command,allcmdArdu[AR]))         { ardufocuser_command_function_AR();        }
-  else if !(strcmp (command,allcmdArdu[AHLIMIT]))    { ardufocuser_command_function_AHLIMIT();   }
-  else if !(strcmp (command,allcmdArdu[AMICRO]))     { ardufocuser_command_function_AMICRO();    }
-  else if !(strcmp (command,allcmdArdu[ASLIMIT] ))   { ardufocuser_command_function_ASLIMIT();   }
-  else if !(strcmp (command,allcmdArdu[ASILIMIT]))   { ardufocuser_command_function_ASILIMIT();  }
-  else if !(strcmp (command,allcmdArdu[ASOLIMIT]))   { ardufocuser_command_function_ASOLIMIT();  }
-  else if !(strcmp (command,allcmdArdu[AVERS]))      { ardufocuser_command_function_AVERS();     }
-  else if !(strcmp (command,allcmdArdu[AMOV]))       { ardufocuser_command_function_AMOV();      }
-  else if !(strcmp (command,allcmdArdu[ARUNA]))      { ardufocuser_command_function_ARUNA();     }
-  else if !(strcmp (command,allcmdArdu[ARUNB]))      { ardufocuser_command_function_ARUNB();     } 
-  else if !(strcmp (command,allcmdArdu[ASTOP]))      { ardufocuser_command_function_ASTOP()      }
+  if      (!(strcmp(command,allcmdArdu[AINIT])) )      { ardufocuser_command_function_AINIT();     }
+  else if (!(strcmp (command,allcmdArdu[AMODE])))      { ardufocuser_command_function_AMODE();     }
+  else if (!(strcmp (command,allcmdArdu[AG])))         { ardufocuser_command_function_AG();        }
+  else if (!(strcmp (command,allcmdArdu[APOSITION])))  { ardufocuser_command_function_APOSITION(); }
+  else if (!(strcmp (command,allcmdArdu[ATEMP])))      { ardufocuser_command_function_ATEMP();     }
+  else if (!(strcmp (command,allcmdArdu[ALTEMP])))     { ardufocuser_command_function_ALTEMP();    }
+  else if (!(strcmp (command,allcmdArdu[AFINE])))      { ardufocuser_command_function_AFINE();     }
+  else if (!(strcmp (command,allcmdArdu[ASPEED])))     { ardufocuser_command_function_ASPEED();    }
+  else if (!(strcmp (command,allcmdArdu[AACC])))       { ardufocuser_command_function_AACC();      }
+  else if (!(strcmp (command,allcmdArdu[AR])))         { ardufocuser_command_function_AR();        }
+  else if (!(strcmp (command,allcmdArdu[AHLIMIT])))    { ardufocuser_command_function_AHLIMIT();   }
+  else if (!(strcmp (command,allcmdArdu[AMICRO])) )    { ardufocuser_command_function_AMICRO();    }
+  else if (!(strcmp (command,allcmdArdu[ASLIMIT] )) )  { ardufocuser_command_function_ASLIMIT();   }
+  else if (!(strcmp (command,allcmdArdu[ASILIMIT])) )  { ardufocuser_command_function_ASILIMIT();  }
+  else if (!(strcmp (command,allcmdArdu[ASOLIMIT])))   { ardufocuser_command_function_ASOLIMIT();  }
+  else if (!(strcmp (command,allcmdArdu[AVERS]))   )   { ardufocuser_command_function_AVERS();     }
+  else if (!(strcmp (command,allcmdArdu[AMOV]))  )     { ardufocuser_command_function_AMOV();      }
+  else if (!(strcmp (command,allcmdArdu[ARUNA])) )     { ardufocuser_command_function_ARUNA();     }
+  else if (!(strcmp (command,allcmdArdu[ARUNB])))      { ardufocuser_command_function_ARUNB();     } 
+  else if (!(strcmp (command,allcmdArdu[ASTOP])))      { ardufocuser_command_function_ASTOP();      }
   
 }
 
@@ -539,7 +554,7 @@ long lastCurrentPos= millis();
 void sendCurrentposition(){
 
   if (millis()> lastCurrentPos + 1000){
-    String r(motor.currentposition());
+    String r(motor.currentPosition());
     sendMessageToIndi("APOSITION?"+ r); 
   
     if (motor.distanceToGo() == 0) { sendMessageToIndi("ASTOP?"); }
@@ -557,7 +572,7 @@ void setup() {
   //Configuracion pines entrada salida.
   pinMode(PINLED_WARNING, OUTPUT);
 
-  motor.setMaxspeed(200);
+  motor.setMaxSpeed(200);
   motor.setAcceleration(1000);
 
   //Variables auxiliares para  saber cuando actualizar la LCD
@@ -586,7 +601,7 @@ void loop(){
   readManualController();
   readOtherSensor();
   readTemperature();
-  UpdateLCD();
+  updateLCD();
   manualPerformance();
   sendCurrentposition();  
   remoteManager(); 
