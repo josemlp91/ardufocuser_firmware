@@ -158,45 +158,22 @@ class WiiChuck {
         return (float)angles[2] - ZEROZ;
     }
 
-  
-
-    // for using the joystick like a directional button
-    boolean rightJoyTouch(int thresh=60) {
-        return (readJoyX() > thresh and lastJoyX <= thresh);
-    }
-
-    // for using the joystick like a directional button
-    boolean leftJoyTouch(int thresh=60) {
-        return (readJoyX() < -thresh and lastJoyX >= -thresh);
-    }
-
-
     boolean zPressed() {
         return (buttonZ);
     }
-
     boolean cPressed() {
-        return (buttonC);
-    }
-
-    boolean cTouch() {
         return (buttonC && ! lastC);
-    }
-
-      boolean zTouch() {
-        return (buttonZ && ! lastZ);
     }
 
     // for using the joystick like a directional button
     boolean rightJoy(int thresh=60) {
-        return (readJoyX() > thresh);
+        return (readJoyX() > thresh and lastJoyX <= thresh);
     }
 
     // for using the joystick like a directional button
     boolean leftJoy(int thresh=60) {
-        return (readJoyX() < -thresh);
+        return (readJoyX() < -thresh and lastJoyX >= -thresh);
     }
-
 
 
     int readJoyX() {

@@ -6,6 +6,20 @@
 #include <AccelStepper.h>
 #include "Ardufocus_config.h"
 
+//Para el nunchuck
+
+#include <Wire.h>
+#include <math.h>
+#include <nunchuck.h>
+//#include "nunchuck_funcs.h"
+
+#define MAXANGLE 90
+#define MINANGLE -90
+
+
+WiiChuck chuck = WiiChuck();
+
+
 
 AccelStepper motor(1, PINSTEP, PINDIR);
 LiquidCrystal lcd(PINLCD_RS, PINLCD_ENABLE, PINLCD_D4, PINLCD_D5, PINLCD_D6, PINLCD_D7);
@@ -37,6 +51,7 @@ int temp=0; int conT=0; float temp_average=0; int temp_perform;   //Temperature 
 // Varaibles para controlar estados pasados del sistema.
 int lastTimeUpdate=1000;
 int lastPulse=btnNONE;
+int lastPulse2=btnNONE;
 int lastspeed = 0;
 int laststepPerPulse = 0;
 int lastposition;
@@ -562,7 +577,56 @@ void sendCurrentposition(){
 
 }
 
+/*
+ * Controlador WiiNunckuck para Ardufocuser
+ */
+void nunckuckController(){
+
+  chuck.update(); 
+
+  if (chuck.rightJoy()){
+    if (chuck.zPressed()){
+      motor.moveTo(30000);
+    }
+    
+    else if (lastPulse2!=btnDOWN){
+          motor.moveTo(motor.currentPosition() + stepPerPulse);         
+    }
+    
+      lastPulse2=btnDOWN;  
+  }
+   
+   else if  (chuck.leftJoy()){
+     if (chuck.zPressed()){
+        motor.moveTo(-30000);
+      }
+            
+      else if (lastPulse2!=btnUP){
+        motor.moveTo(motor.currentPosition() - stepPerPulse);
+      }  
+      
+        lastPulse2=btnUP; 
+     
+   }
+
+   else  {
+    lastPulse2=btnNONE; 
+    motor.stop();
+
+   }
+
+}
+
 void setup() {
+
+  // Iniciamos nunckuck
+  chuck.begin();
+  chuck.update();
+
+  // debug
+  pinMode(13, OUTPUT); 
+
+
   limitRunSoftwareA=-300;
   limitRunSoftwareB=300;
   
@@ -597,10 +661,12 @@ void setup() {
 
 void loop(){
 
+  nunckuckController();
+
   readManualController();
-  readOtherSensor();
-  readTemperature();
-  updateLCD();
+  //readOtherSensor();
+  //readTemperature();
+  //updateLCD();
   manualPerformance();
   sendCurrentposition();  
   remoteManager(); 

@@ -7,8 +7,8 @@
 #define MINACC   500
 #define DEF_ACC  300 
 
-#define PINDIR 44   // Arduino Mega
-#define PINSTEP 42  // Arduino Mega
+#define PINDIR 9   // Arduino Mega
+#define PINSTEP 3  // Arduino Mega
 
 #define PIN_BUTTON A0
 #define PIN_POTA A1
