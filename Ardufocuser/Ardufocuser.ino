@@ -661,7 +661,7 @@ void setup() {
 
 void loop(){
 
-  nunckuckController();
+  
 
   readManualController();
   //readOtherSensor();
@@ -670,7 +670,7 @@ void loop(){
   manualPerformance();
   sendCurrentposition();  
   remoteManager(); 
-
+  nunckuckController();
 }
  
 
