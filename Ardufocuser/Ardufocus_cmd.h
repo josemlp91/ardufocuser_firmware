@@ -185,10 +185,12 @@ void ardufocuser_command_function_AVERS(){
 
 
 void ardufocuser_command_function_ARUNA(){
+	 motor.setMaxSpeed(500);
 	 motor.moveTo(30000);
 }
 
 void ardufocuser_command_function_ARUNB(){
+	motor.setMaxSpeed(500);
 	 motor.moveTo(-30000);
 }
 
@@ -203,9 +205,10 @@ void ardufocuser_command_function_ALUX(){
 }
 
 void ardufocuser_command_function_ACALIBRATE(){
-	  int Ilux=atoi(data);
-	  BRIGHTNESS=Ilux;
-	  setBrightness(BRIGHTNESS); 
+	
+	
+	
+	
 }
 
 

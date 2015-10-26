@@ -132,7 +132,7 @@ void timerFunction() {
     
     // Hack que modifica velocidad cuando nos aproximamos a limite software, para evitar que salte la posición. 
     if ((position < limitRunSoftwareA + 100) || (position > limitRunSoftwareB - 100) ){
-      motor.setMaxSpeed(1);
+     motor.setMaxSpeed(1);
     }
 
 
@@ -159,52 +159,6 @@ void timerFunction() {
        // Si no se cumple ninguna condición permitir girar libremente.
       else motor.run();
      
-
-
-
-
-  /*
-  if (!limitRunActiveA and !limitRunActiveB){ 
-  
-      // Controlamos límites hardware para fines de carrera.
-
-      // if (position >= limitRunSoftwareA ){
-      //   limitRunSoftwareActiveA=true;
-      //   if (motor.targetposition <= limitRunSoftwareA)
-      //     motor.stop();
-      //   else motor.run(); limitRunSoftwareActiveA=false;
-      // }
-
-      // if (position <= limitRunSoftwareB ) {
-      //   limitRunSoftwareActiveB=true;
-      //   if (motor.targetposition() >= limitRunSoftwareB)
-      //     motor.stop();
-      //   else motor.run(); limitRunSoftwareActiveB=false;
-      // }
-
-      motor.run();
-   }  ///Necesita testearse muy bien
-
-  else if (limitRunActiveA){
-
-    if (motor.targetposition() < motor.currentposition()){
-      motor.run(); 
-      limitRunActiveA=false;
-
-    } else { motor.stop(); limitRunActiveB=true; }
-  
-  }
-
-  else if (limitRunActiveB){
-
-    if (motor.targetposition() > motor.currentposition()){
-      motor.run();
-      limitRunActiveB=false;
-
-    } else { motor.stop(); limitRunActiveB=true; }
-
-  }
-  */
 }
 
 /*
@@ -649,7 +603,8 @@ void nunckuckController(){
 
    else  {
     lastPulse2=btnNONE; 
-    motor.stop();
+    motor.moveTo(motor.currentPosition());
+   // motor.stop();
 
    }
 
