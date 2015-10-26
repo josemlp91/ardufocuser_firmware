@@ -28,12 +28,14 @@ LiquidCrystal lcd(PINLCD_RS, PINLCD_ENABLE, PINLCD_D4, PINLCD_D5, PINLCD_D6, PIN
 // Variable para boton activo en cada momento.
 int button=btnNONE;  
 
+int BRIGHTNESS = 50;
+
 // Variables para controlar los limites findes de carrera hardware.
 bool limitRunActiveA=false; bool limitRunActiveB=false;
 
 // Variables para controlar los limites fines de carrera software. 
 bool limitRunSoftwareActiveA=false; bool limitRunSoftwareActiveB=false;
-int  limitRunSoftwareA=300; int  limitRunSoftwareB=-300;
+int  limitRunSoftwareA=-300; int  limitRunSoftwareB=300;
 
 // Variable para controlar velocidad.
 int speed = 0;
@@ -126,7 +128,41 @@ void finB(){ limitRunActiveB=true; }
 
 void timerFunction() { 
 
-  motor.run();
+  position=motor.currentPosition();
+    
+    // Hack que modifica velocidad cuando nos aproximamos a limite software, para evitar que salte la posición. 
+    if ((position < limitRunSoftwareA + 100) || (position > limitRunSoftwareB - 100) ){
+      motor.setMaxSpeed(1);
+    }
+
+
+    if (position == limitRunSoftwareA ){
+        // Solo permitirmos movimiento en el sentido opuesto al límite.         
+         if (motor.targetPosition() > limitRunSoftwareA)
+           { motor.run(); limitRunSoftwareActiveA=false;}
+           
+         else 
+          {  motor.moveTo(limitRunSoftwareA);  limitRunSoftwareActiveA=true;}
+          
+      }
+
+       if (position == limitRunSoftwareB ) {
+          // Solo permitirmos movimiento en el sentido opuesto al límite.
+         if (motor.targetPosition() < limitRunSoftwareB)
+          { motor.run(); limitRunSoftwareActiveB=false; }
+          
+         else 
+           { motor.moveTo(limitRunSoftwareB);   limitRunSoftwareActiveB=true; }
+          
+       }
+
+       // Si no se cumple ninguna condición permitir girar libremente.
+      else motor.run();
+     
+
+
+
+
   /*
   if (!limitRunActiveA and !limitRunActiveB){ 
   
@@ -560,6 +596,7 @@ void driveCommandArdufocus(){
   else if (!(strcmp (command,allcmdArdu[ARUNA])) )     { ardufocuser_command_function_ARUNA();     }
   else if (!(strcmp (command,allcmdArdu[ARUNB])))      { ardufocuser_command_function_ARUNB();     } 
   else if (!(strcmp (command,allcmdArdu[ASTOP])))      { ardufocuser_command_function_ASTOP();      }
+  else if (!(strcmp (command,allcmdArdu[ALUX])))      { ardufocuser_command_function_ALUX();      }
   
 }
 
@@ -583,6 +620,7 @@ void sendCurrentposition(){
 void nunckuckController(){
 
   chuck.update(); 
+   
 
   if (chuck.rightJoy()){
     if (chuck.zPressed()){
@@ -627,8 +665,8 @@ void setup() {
   pinMode(13, OUTPUT); 
 
 
-  limitRunSoftwareA=-300;
-  limitRunSoftwareB=300;
+  //limitRunSoftwareA=-300;
+  //limitRunSoftwareB=300;
   
   Serial.begin(9600);
 
@@ -652,7 +690,7 @@ void setup() {
 //         attachInterrupt ( 1, finB,RISING);
 
   //Ajustamos el brillo y saludo inicial.
-   setBrightness(50);
+   setBrightness(BRIGHTNESS);
    welcome("  ARDUFOCUSER"); 
 
 }
@@ -664,10 +702,10 @@ void loop(){
   
 
   readManualController();
-  //readOtherSensor();
+  readOtherSensor();
   //readTemperature();
-  //updateLCD();
-  manualPerformance();
+  updateLCD();
+  //manualPerformance();
   sendCurrentposition();  
   remoteManager(); 
   nunckuckController();

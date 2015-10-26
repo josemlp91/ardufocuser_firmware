@@ -21,9 +21,12 @@
 #define ARUNA   	17   // Comando para debug: Mueve el motor del enfocador en una dirreción.
 #define ARUNB   	18   // Comando para debug: Mueve el motor del enfocador en una dirreción.
 #define ASTOP   	19   // Comando para debug: Detiene motor del enfocador
+#define ALUX   	    20   // Modifica la intesindad de la ilumincaicon de la pantalla.
+#define ACALIBRATE   	 21   // Configura los limites software.
 
 
-char *allcmdArdu[20]={
+
+char *allcmdArdu[22]={
 						"AINIT",
 						"AMODE",
 						"AG",
@@ -43,7 +46,9 @@ char *allcmdArdu[20]={
 						"AMOV",
 						"ARUNA",
 						"ARUNB",
-						"ASTOP"
+						"ASTOP",
+						"ALUX",
+						"ACALIBRATE"
 };
 
 
@@ -139,15 +144,39 @@ void ardufocuser_command_function_AMICRO(){
 
 
 void ardufocuser_command_function_ASLIMIT(){
-	Serial.println("Consultar si el enfocador ha llegado a un limite software.");
+	if (limitRunSoftwareActiveA || limitRunSoftwareActiveA){
+		sendMessageToIndi("ASLIMIT?1");
+	}
+	else sendMessageToIndi("ASLIMIT?0");
 }
 
 void ardufocuser_command_function_ASILIMIT(){
-	Serial.println("Establecer limite software inware.");
+
+	int Ilima=atoi(data);
+   
+	if  (Ilima < motor.currentPosition()){
+     	limitRunSoftwareA=Ilima;
+     	
+     }
+
+		String slima(limitRunSoftwareA);    
+
+	sendMessageToIndi("ASILIMIT?"+ slima ); 
 }
 
 void ardufocuser_command_function_ASOLIMIT(){
-	Serial.println("Establecer limite software outware. ");
+
+	 int Ilimb=atoi(data);
+	
+   
+	 if (Ilimb > motor.currentPosition()){
+    	 limitRunSoftwareB=Ilimb;
+     	 
+ 	}
+ 	
+ 	 String slimb(limitRunSoftwareB);
+
+	sendMessageToIndi("ASOLIMIT?"+ slimb ); 
 }
 
 void ardufocuser_command_function_AVERS(){
@@ -166,3 +195,20 @@ void ardufocuser_command_function_ARUNB(){
 void ardufocuser_command_function_ASTOP(){
 	  motor.stop();
 }
+
+void ardufocuser_command_function_ALUX(){
+	  int Ilux=atoi(data);
+	  BRIGHTNESS=Ilux;
+	  setBrightness(BRIGHTNESS); 
+}
+
+void ardufocuser_command_function_ACALIBRATE(){
+	  int Ilux=atoi(data);
+	  BRIGHTNESS=Ilux;
+	  setBrightness(BRIGHTNESS); 
+}
+
+
+
+
+

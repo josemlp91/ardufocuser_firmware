@@ -7,12 +7,12 @@
 #define MINACC   500
 #define DEF_ACC  300 
 
-#define PINDIR 2   // Arduino Mega
+#define PINDIR 7   // Arduino Mega
 #define PINSTEP 3  // Arduino Mega
 
-#define PIN_BUTTON A3
+#define PIN_BUTTON A0
 #define PIN_POTA A1
-#define PIN_POTB A0
+#define PIN_POTB A3
 
 //#define PIN_LIMITRUNA 2  
 //#define PIN_LIMITRUNB 1 //not defined
@@ -28,7 +28,7 @@
 #define PINLCD_D6 6
 #define PINLCD_D7 7
 
-
+#define BRIGHTNESS 20
 #define PINBRIGHTNESS 10
 
 #define MAX_CHANGE_TEMP 2 
@@ -43,9 +43,6 @@ const int btnDOWN=2;
 const int btnLEFT=3;
 const int btnSELECT=4; 
 const int btnNONE=5;
-
-
-
 
 /*
 
