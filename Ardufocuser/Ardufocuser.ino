@@ -17,17 +17,21 @@
 #define MINANGLE -90
 
 
+// Iniciamos nunchuck
 WiiChuck chuck = WiiChuck();
 
 
-
+// Configuramos pines POLOLU
 AccelStepper motor(1, PINSTEP, PINDIR);
+
+// Configuramos pines LCD
 LiquidCrystal lcd(PINLCD_RS, PINLCD_ENABLE, PINLCD_D4, PINLCD_D5, PINLCD_D6, PINLCD_D7);
 
 
 // Variable para boton activo en cada momento.
 int button=btnNONE;  
 
+// Brillo por defecto.
 int BRIGHTNESS = 50;
 
 // Variables para controlar los limites findes de carrera hardware.
@@ -77,6 +81,9 @@ int byteCount;
 char buffer[bSize];     // buffer
 char command[bSize];    // almacenamos comando
 char data[bSize];       // almacenamos parametro
+
+ bool flag=true;
+
 
 #include "Ardufocus_cmd.h"
 
@@ -130,26 +137,20 @@ void timerFunction() {
 
   position=motor.currentPosition();
     
-    // Hack que modifica velocidad cuando nos aproximamos a limite software, para evitar que salte la posición. 
-    if ((position < limitRunSoftwareA + 100) || (position > limitRunSoftwareB - 100) ){
-     motor.setMaxSpeed(1);
-    }
-
-
-    if (position == limitRunSoftwareA ){
+    if (position == limitRunSoftwareA) {
         // Solo permitirmos movimiento en el sentido opuesto al límite.         
          if (motor.targetPosition() > limitRunSoftwareA)
-           { motor.run(); limitRunSoftwareActiveA=false;}
+           { motor.run(); limitRunSoftwareActiveA=false;  position=motor.currentPosition();}
            
          else 
           {  motor.moveTo(limitRunSoftwareA);  limitRunSoftwareActiveA=true;}
           
       }
 
-       if (position == limitRunSoftwareB ) {
+       if (position == limitRunSoftwareB) {
           // Solo permitirmos movimiento en el sentido opuesto al límite.
          if (motor.targetPosition() < limitRunSoftwareB)
-          { motor.run(); limitRunSoftwareActiveB=false; }
+          { motor.run(); limitRunSoftwareActiveB=false;  position=motor.currentPosition(); }
           
          else 
            { motor.moveTo(limitRunSoftwareB);   limitRunSoftwareActiveB=true; }
@@ -157,7 +158,9 @@ void timerFunction() {
        }
 
        // Si no se cumple ninguna condición permitir girar libremente.
-      else motor.run();
+      else {motor.run(); position=motor.currentPosition();}
+
+
      
 }
 
@@ -170,11 +173,13 @@ void readManualController(){
   // Si ya se a cumplido el intervalo de tiempo, realizamos lectura.
   if (millis() > lastTimeReadButton + 5) {
     int adc_key = analogRead(PIN_BUTTON);
+
     // Pare evitar rebotes estraños en la lectura de los botones,
     // reliazamos dos lecturas, separadas por un delay
     button = read_LCD_buttons(adc_key);
-    delay(200);   // Este delay debe ser lo suficiente para evitar el rebote y que mantenga la interectividad del contro.
+    delay(200);   // Este delay debe ser lo suficiente para evitar el rebote y que mantenga la interactividad del control.
     button2 = read_LCD_buttons(adc_key);
+
     if (button!=button2){button=btnNONE;}
 
     // Refrescamos momento de actualización.
@@ -258,6 +263,7 @@ void updateLCD(){
   if (millis() > lastTimeUpdateLcd + 15) {
 
     // Si ha cambiado el boton desde la última pulsación.
+    /*
     if (button != lastPulse)  {
 
       // actualizamos zona LCD donde se muestra el comando.
@@ -275,45 +281,51 @@ void updateLCD(){
       }
 
     }
+    */
+
+    if (millis() > lastTimeUpdateLcd + 200) {
+
 
        // Actualizamos zona de la temperatura
-       lcd.setCursor(2,0);
-       lcd.print("    ");
-       lcd.setCursor(2,0);
+       lcd.setCursor(0,0);
+       lcd.print("TEMP:   ");
+       lcd.setCursor(5,0);
        lcd.print((int)temp_average);
         
        // si se produce un cambio significativo en el control de la velocidad.
-       if ((lastspeed>speed+5) or (lastspeed<speed-5))  {
+       //if ((lastspeed>speed+1) or (lastspeed<speed-1))  {
          // Actualizar zona LCD donde se muestra la velocidad.
-         lcd.setCursor(8,1);
-         lcd.print("    ");
-         lcd.setCursor(8,1);
+         lcd.setCursor(0,1);
+         lcd.print("SP:   ");
+         lcd.setCursor(3,1);
          lcd.print(speed);
          lastspeed=speed;
-       }
+       //}
       
        // Si se produce un cambio significativo en el control de los pasos por pulso.
-       if ((laststepPerPulse>stepPerPulse+5) or (laststepPerPulse<stepPerPulse-5))  {
+       //if ((laststepPerPulse>stepPerPulse+1) or (laststepPerPulse<stepPerPulse-1))  {
          // Actualizar zona LCD donde se muestran los pasos por pulso.
-         lcd.setCursor(12,1);
-         lcd.print("    ");
+         lcd.setCursor(8,1);
+         lcd.print("ST:   ");
          lcd.setCursor(12,1);
          lcd.print(stepPerPulse);
          laststepPerPulse=stepPerPulse;
-      }  
+      //}  
         
        // Si se produce un cambio significativo en la posicion.
-       if ((lastposition>position+1) or (lastposition<position-1)){
+       //if ((lastposition>position+1) or (lastposition<position-1)){
          // Actualizar zona LCD donde se muestran la posición.
-         lcd.setCursor(4,0);
-         lcd.print("            ");    
          lcd.setCursor(8,0);
+         lcd.print("POS:    ");    
+         lcd.setCursor(12,0);
          lcd.print(position);
          lastposition=position;
-     }
+     //}
+
 
      // Refrescamos momento de actualizacion.
      lastTimeUpdateLcd = millis();
+  }
   }      
 
 }
@@ -578,7 +590,7 @@ void nunckuckController(){
 
   if (chuck.rightJoy()){
     if (chuck.zPressed()){
-      motor.moveTo(30000);
+      motor.moveTo(limitRunSoftwareB);
     }
     
     else if (lastPulse2!=btnDOWN){
@@ -590,7 +602,7 @@ void nunckuckController(){
    
    else if  (chuck.leftJoy()){
      if (chuck.zPressed()){
-        motor.moveTo(-30000);
+        motor.moveTo(limitRunSoftwareA);
       }
             
       else if (lastPulse2!=btnUP){

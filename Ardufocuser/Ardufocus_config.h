@@ -2,7 +2,7 @@
 #define MAXSTEPPXPULSA   100
 
 #define MAXVEL   500
-#define MINVEL   50
+#define MINVEL   1
 #define MAXACC   0
 #define MINACC   500
 #define DEF_ACC  300 
