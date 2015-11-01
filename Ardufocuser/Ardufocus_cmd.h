@@ -138,8 +138,42 @@ void ardufocuser_command_function_AMOV(){
 }
 
 
+
+void setMicroFullStep()     { digitalWrite(PINMICROSTEP_MS1,LOW);  digitalWrite(PINMICROSTEP_MS2,LOW);  digitalWrite(PINMICROSTEP_MS3,LOW); microStep=1; }
+void setMicroHalfStep()     { digitalWrite(PINMICROSTEP_MS1,HIGH);  digitalWrite(PINMICROSTEP_MS2,LOW);  digitalWrite(PINMICROSTEP_MS3,LOW); microStep=2; }
+void setMicroQuarterStep()  { digitalWrite(PINMICROSTEP_MS1,LOW);  digitalWrite(PINMICROSTEP_MS2,HIGH);  digitalWrite(PINMICROSTEP_MS3,LOW); microStep=3; }
+void setMicroEighthStep()   { digitalWrite(PINMICROSTEP_MS1,HIGH);  digitalWrite(PINMICROSTEP_MS2,HIGH);  digitalWrite(PINMICROSTEP_MS3,LOW); microStep=4; }
+void setMicroSixteenthStep(){ digitalWrite(PINMICROSTEP_MS1,HIGH);  digitalWrite(PINMICROSTEP_MS2,HIGH);  digitalWrite(PINMICROSTEP_MS3,HIGH); microStep=5; }
+
 void ardufocuser_command_function_AMICRO(){
-	Serial.println("Ajusta micropasos");
+	int Imicro=atoi(data);
+
+	switch (Imicro) {
+    case 1:
+     	setMicroFullStep();
+      	break;
+    case 2:
+      	setMicroHalfStep();
+      	break;
+    case 3:
+      	setMicroQuarterStep();
+      	break;
+    case 4:
+      	setMicroEighthStep();
+      	break;
+    case 5:
+      	setMicroSixteenthStep();
+    	break;
+
+    default:
+	 	setMicroSixteenthStep();
+    break;
+
+   
+  }
+   String smicro(microStep);
+	sendMessageToIndi("AMICRO?"+ smicro ); 
+
 }
 
 
@@ -203,6 +237,9 @@ void ardufocuser_command_function_ALUX(){
 	  BRIGHTNESS=Ilux;
 	  setBrightness(BRIGHTNESS); 
 }
+
+
+
 
 void ardufocuser_command_function_ACALIBRATE(){
 	

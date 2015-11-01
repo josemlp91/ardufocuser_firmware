@@ -62,7 +62,7 @@ int lastspeed = 0;
 int laststepPerPulse = 0;
 int lastposition;
 int lastTemp[10];
-int microStep;
+int microStep=1;
 bool motorIsRun;
 
 bool hadToReadspeed=true;
@@ -133,6 +133,10 @@ void finA(){ limitRunActiveA=true; }
 void finB(){ limitRunActiveB=true; }
 
 
+
+/*
+ * Bucle principal interrupción software.
+ */
 void timerFunction() { 
 
   position=motor.currentPosition();
@@ -295,9 +299,9 @@ void updateLCD(){
        // si se produce un cambio significativo en el control de la velocidad.
        //if ((lastspeed>speed+1) or (lastspeed<speed-1))  {
          // Actualizar zona LCD donde se muestra la velocidad.
-         lcd.setCursor(0,1);
-         lcd.print("SP:   ");
-         lcd.setCursor(3,1);
+         lcd.setCursor(8,1);
+         lcd.print("SP:    ");
+         lcd.setCursor(12,1);
          lcd.print(speed);
          lastspeed=speed;
        //}
@@ -305,9 +309,10 @@ void updateLCD(){
        // Si se produce un cambio significativo en el control de los pasos por pulso.
        //if ((laststepPerPulse>stepPerPulse+1) or (laststepPerPulse<stepPerPulse-1))  {
          // Actualizar zona LCD donde se muestran los pasos por pulso.
-         lcd.setCursor(8,1);
+         
+         lcd.setCursor(0,1);
          lcd.print("ST:   ");
-         lcd.setCursor(12,1);
+         lcd.setCursor(3,1);
          lcd.print(stepPerPulse);
          laststepPerPulse=stepPerPulse;
       //}  
@@ -628,18 +633,18 @@ void setup() {
   chuck.begin();
   chuck.update();
 
-  // debug
-  pinMode(13, OUTPUT); 
-
-
-  //limitRunSoftwareA=-300;
-  //limitRunSoftwareB=300;
-  
+  // Iniciamos comunicación serie.
   Serial.begin(9600);
 
+  // Habilitamos salidas para seleccionar micropasos.
+  pinMode(PINMICROSTEP_MS1, OUTPUT); 
+  pinMode(PINMICROSTEP_MS2, OUTPUT); 
+  pinMode(PINMICROSTEP_MS3, OUTPUT);
+  
   //Configuracion pines entrada salida.
   pinMode(PINLED_WARNING, OUTPUT);
 
+  // Velocidad y aceletación por defecto.
   motor.setMaxSpeed(200);
   motor.setAcceleration(1000);
 
@@ -668,6 +673,7 @@ void loop(){
 
   
 
+
   readManualController();
   readOtherSensor();
   //readTemperature();
@@ -675,7 +681,7 @@ void loop(){
   //manualPerformance();
   sendCurrentposition();  
   remoteManager(); 
-  nunckuckController();
+  //nunckuckController();
 }
  
 
