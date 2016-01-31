@@ -4,7 +4,7 @@ python:
 
 install:
     - python -c "$(curl -fsSL https://raw.githubusercontent.com/platformio/platformio/master/scripts/get-platformio.py)"
-    - wget https://github.com/josemlp91/ardufocuser_firmware/raw/master/Ardufocuser/libs/TimerOne.zip",
+    - wget https://github.com/josemlp91/ardufocuser_firmware/raw/master/Ardufocuser/libs/TimerOne.zip
     - unzip TimerOne.zip
     - wget https://github.com/josemlp91/ardufocuser_firmware/raw/master/Ardufocuser/libs/lcd.zip
     - unzip lcd.zip
