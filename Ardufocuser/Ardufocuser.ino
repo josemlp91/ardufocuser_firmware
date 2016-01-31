@@ -99,7 +99,7 @@ int read_LCD_buttons(int adc_key){
 */
 void welcome(String msgGreet){
 
-  lcd.begin(16, 2);
+  //lcd.begin(16, 2);
   lcd.setCursor(0,0);
   lcd.print(msgGreet);
   delay(3000);
@@ -111,7 +111,7 @@ void welcome(String msgGreet){
 /*
 * Funcion que ajusta el brillo de la LCD.
 */
-void setBrightness(int bright){ lcd.backlight(bright); }  //Brillo del LCD
+void setBrightness(int bright){ lcd.backlight(); }  //Brillo del LCD
 void noBrightness(int bright) { lcd.noBacklight(); }  //Apaga el brillo del LCD
 
 /*
@@ -630,8 +630,7 @@ void eeprom_save_integer(int base_direction, int data){
   EEPROM.write(base_direction+1, L);
 }
 
-
-int last_eeprom_time_try_tosave=0
+int last_eeprom_time_try_tosave=0;
 void eeprom_save_position(){
 
   byte position_L;
