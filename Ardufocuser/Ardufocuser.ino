@@ -5,17 +5,9 @@
 #include <LiquidCrystal.h>
 #include <AccelStepper.h>
 #include "Ardufocus_config.h"
-
-//Para el nunchuck
-
 #include <Wire.h>
 #include <math.h>
 #include <nunchuck.h>
-//#include "nunchuck_funcs.h"
-
-#define MAXANGLE 90
-#define MINANGLE -90
-
 
 // Iniciamos nunchuck
 WiiChuck chuck = WiiChuck();
