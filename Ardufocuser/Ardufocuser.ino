@@ -641,7 +641,7 @@ void eeprom_save_position(){
     eepron_position=eeprom_load_integer(EEPROM_DIR_POSITION);
 
     if (eepron_position!=position){
-      eeprom_save_integer(EEPROM_DIR_POSITION,position)
+      eeprom_save_integer(EEPROM_DIR_POSITION,position);
       last_eeprom_time_try_tosave = millis();
     }
   }
