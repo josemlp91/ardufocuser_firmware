@@ -1,5 +1,9 @@
+language: python
+python:
+    - "2.7"
+
 install:
-    - pip install -U platformio
+    - python -c "$(curl -fsSL https://raw.githubusercontent.com/platformio/platformio/master/scripts/get-platformio.py)"
     - wget https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/arduino-timerone/TimerOne-r11.zip
     - unzip /tmp/TimerOne-r11.zip -d /tmp/
     - wget http://playground.arduino.cc/uploads/Main/LiquidCrystal.zip
