@@ -7,7 +7,6 @@
 #define MINACC   501
 #define DEF_ACC  300
 
-
 // PINEOUT MAP.
 /// digital
 #define PINDIR 2
@@ -20,23 +19,19 @@
 #define PINLED_WARNING 50
 #define MAX_CHANGE_TEMP 2
 
-
-#define PINLCD_RS 8
-#define PINLCD_ENABLE 9
-#define PINLCD_D4 4
-#define PINLCD_D5 5
-#define PINLCD_D6 6
-#define PINLCD_D7 7
-#define PINBRIGHTNESS 10
-
-
 #define PINMICROSTEP_MS1 11
 #define PINMICROSTEP_MS2 12
 #define PINMICROSTEP_MS3 13
 
 
-// analogic
+// Direccion memoria  eeprom
+# define EEPROM_DIR_POSITION 20
+# define EEPROM_DIR_SPEED 30
+# define EEPROM_DIR_STEEP 40
+# define EEPROM_DIR_MICRO 50
 
+// analogic
+// I2C
 #define PIN_I2C_SDA A4
 #define PIN_I2C_SCL A5
 

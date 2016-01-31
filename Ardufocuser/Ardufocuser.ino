@@ -2,23 +2,24 @@
 #define DEBUG 0
 
 #include <TimerOne.h>
-#include <LiquidCrystal.h>
+//#include <LiquidCrystal.h>
+#include <LiquidCrystal_I2C.h>
 #include <AccelStepper.h>
 #include "Ardufocus_config.h"
 #include <Wire.h>
 #include <math.h>
 #include <nunchuck.h>
+#include <EEPROM.h>
+
 
 // Iniciamos nunchuck
 WiiChuck chuck = WiiChuck();
 
-
 // Configuramos pines POLOLU
 AccelStepper motor(1, PINSTEP, PINDIR);
 
-// Configuramos pines LCD
-LiquidCrystal lcd(PINLCD_RS, PINLCD_ENABLE, PINLCD_D4, PINLCD_D5, PINLCD_D6, PINLCD_D7);
-
+// Configuramos LCD I2C en canal 27.
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 // Variable para boton activo en cada momento.
 int button=btnNONE;
@@ -44,7 +45,6 @@ int position;
 
 // Variables para controlar la temperatura.
 int temp=0; int conT=0; float temp_average=0; int temp_perform;   //Temperature in the moment of focus change.
-
 
 // Varaibles para controlar estados pasados del sistema.
 int lastTimeUpdate=1000;
@@ -74,8 +74,6 @@ char buffer[bSize];     // buffer
 char command[bSize];    // almacenamos comando
 char data[bSize];       // almacenamos parametro
 
- bool flag=true;
-
 
 #include "Ardufocus_cmd.h"
 
@@ -96,7 +94,6 @@ int read_LCD_buttons(int adc_key){
 
 }
 
-
 /*
 * Funcion que imprime en LCD un saludo inicial.
 */
@@ -114,8 +111,8 @@ void welcome(String msgGreet){
 /*
 * Funcion que ajusta el brillo de la LCD.
 */
-void setBrightness(int bright){ analogWrite(PINBRIGHTNESS,bright); }  //Brillo del LCD
-
+void setBrightness(int bright){ lcd.backlight(bright); }  //Brillo del LCD
+void noBrightness(int bright) { lcd.noBacklight(); }  //Apaga el brillo del LCD
 
 /*
 * Rutinas que se ejecutan bajo la interrupción hardware
@@ -124,23 +121,18 @@ void setBrightness(int bright){ analogWrite(PINBRIGHTNESS,bright); }  //Brillo d
 void finA(){ limitRunActiveA=true; }
 void finB(){ limitRunActiveB=true; }
 
-
-
 /*
  * Bucle principal interrupción software.
  */
 void timerFunction() {
 
   position=motor.currentPosition();
-
     if (position == limitRunSoftwareA) {
         // Solo permitirmos movimiento en el sentido opuesto al límite.
          if (motor.targetPosition() > limitRunSoftwareA)
            { motor.run(); limitRunSoftwareActiveA=false;  position=motor.currentPosition();}
-
          else
           {  motor.moveTo(limitRunSoftwareA);  limitRunSoftwareActiveA=true;}
-
       }
 
        if (position == limitRunSoftwareB) {
@@ -155,25 +147,26 @@ void timerFunction() {
 
        // Si no se cumple ninguna condición permitir girar libremente.
       else {motor.run(); position=motor.currentPosition();}
-
-
-
 }
 
 /*
 * Rutinas que actualiza los controles manuale, cuando pulsamos algun boton o actuamos sobre algun potenticometro.
 */
 void readManualController(){
-  int button2;
+
+  //int button2;
   // Para evitar sobrecargar la placa hacemos las lecturas dado un intervalo de tiempo.
   // Si ya se a cumplido el intervalo de tiempo, realizamos lectura.
+
+  /* Este vloque se usaba con unos botones analogicos.
   if (millis() > lastTimeReadButton + 5) {
     int adc_key = analogRead(PIN_BUTTON);
 
-    // Pare evitar rebotes estraños en la lectura de los botones,
-    // reliazamos dos lecturas, separadas por un delay
+     Pare evitar rebotes estraños en la lectura de los botones,
+    reliazamos dos lecturas, separadas por un delay
+
     button = read_LCD_buttons(adc_key);
-    delay(200);   // Este delay debe ser lo suficiente para evitar el rebote y que mantenga la interactividad del control.
+    delayMicroseconds(200);   // Este delay debe ser lo suficiente para evitar el rebote y que mantenga la interactividad del control.
     button2 = read_LCD_buttons(adc_key);
 
     if (button!=button2){button=btnNONE;}
@@ -186,15 +179,15 @@ void readManualController(){
   else {
     button=lastPulse;
   }
+  */
 
-
+  // Lectura de los potenciometros.
   if (millis() > lastTimeReadController + 200) {
 
      int s = analogRead(PIN_POTA);
      // Cuando bajoamos el potenciometro al valor 0 forzamos a actualizar la velocidad.
      // Esto se hace así para contemplar la posibilidad de que se esten modificando los valores de forma remota.
      if (s==0) hadToReadspeed=true;
-
      if (hadToReadspeed){
         speed = map(s, 0, 1024, MINVEL, MAXVEL );
      }
@@ -236,7 +229,6 @@ long lastTimeReadTemp = 0;
 float readTemperature(){
 
   if (millis() > lastTimeReadTemp + 10000) {
-
       float t;
       t=analogRead(PIN_TEMSENSOR)* 0.48828125;
       if (abs(t-temp_average)<=2) temp_average=t;
@@ -259,9 +251,8 @@ void updateLCD(){
   if (millis() > lastTimeUpdateLcd + 15) {
 
     // Si ha cambiado el boton desde la última pulsación.
-    /*
-    if (button != lastPulse)  {
 
+    if (button != lastPulse)  {
       // actualizamos zona LCD donde se muestra el comando.
       lcd.setCursor(0,1);
       switch (button){
@@ -275,12 +266,9 @@ void updateLCD(){
       lastPulse=button;
 
       }
-
     }
-    */
 
     if (millis() > lastTimeUpdateLcd + 200) {
-
 
        // Actualizamos zona de la temperatura
        lcd.setCursor(0,0);
@@ -290,7 +278,7 @@ void updateLCD(){
 
        // si se produce un cambio significativo en el control de la velocidad.
        //if ((lastspeed>speed+1) or (lastspeed<speed-1))  {
-         // Actualizar zona LCD donde se muestra la velocidad.
+       // Actualizar zona LCD donde se muestra la velocidad.
          lcd.setCursor(8,1);
          lcd.print("SP:    ");
          lcd.setCursor(12,1);
@@ -300,7 +288,7 @@ void updateLCD(){
 
        // Si se produce un cambio significativo en el control de los pasos por pulso.
        //if ((laststepPerPulse>stepPerPulse+1) or (laststepPerPulse<stepPerPulse-1))  {
-         // Actualizar zona LCD donde se muestran los pasos por pulso.
+       // Actualizar zona LCD donde se muestran los pasos por pulso.
 
          lcd.setCursor(0,1);
          lcd.print("ST:   ");
@@ -311,7 +299,7 @@ void updateLCD(){
 
        // Si se produce un cambio significativo en la posicion.
        //if ((lastposition>position+1) or (lastposition<position-1)){
-         // Actualizar zona LCD donde se muestran la posición.
+       // Actualizar zona LCD donde se muestran la posición.
          lcd.setCursor(8,0);
          lcd.print("POS:    ");
          lcd.setCursor(12,0);
@@ -565,6 +553,7 @@ void driveCommandArdufocus(){
 
 
 long lastCurrentPos= millis();
+
 void sendCurrentposition(){
 
   if (millis()> lastCurrentPos + 1000){
@@ -583,8 +572,6 @@ void sendCurrentposition(){
 void nunckuckController(){
 
   chuck.update();
-
-
   if (chuck.rightJoy()){
     if (chuck.zPressed()){
       motor.moveTo(limitRunSoftwareB);
@@ -593,7 +580,6 @@ void nunckuckController(){
     else if (lastPulse2!=btnDOWN){
           motor.moveTo(motor.currentPosition() + stepPerPulse);
     }
-
       lastPulse2=btnDOWN;
   }
 
@@ -605,9 +591,7 @@ void nunckuckController(){
       else if (lastPulse2!=btnUP){
         motor.moveTo(motor.currentPosition() - stepPerPulse);
       }
-
         lastPulse2=btnUP;
-
    }
 
    else  {
@@ -617,6 +601,51 @@ void nunckuckController(){
 
    }
 
+}
+
+/// Ver libreria: http://playground.arduino.cc/Code/DatabaseLibrary
+/// Por si llega a ser útil.
+//////////ALMACENAR CONFIGURACION EN EEPROM.
+int eeprom_load_integer(int base_direction){
+  byte L;
+  byte H;
+  int data;
+
+  H = EEPROM.read(base_direction);
+  L = EEPROM.read(base_direction +1);
+
+  data = L | H << 8;
+  return data;
+}
+
+void eeprom_save_integer(int base_direction, int data){
+
+  byte L;
+  byte H;
+
+  H = highByte(data);
+  L = lowByte(data);
+
+  EEPROM.write(base_direction, H);
+  EEPROM.write(base_direction+1, L);
+}
+
+
+int last_eeprom_time_try_tosave=0
+void eeprom_save_position(){
+
+  byte position_L;
+  byte position_H;
+  int eepron_position;
+
+  if (millis() > last_eeprom_time_try_tosave + 2000) {
+    eepron_position=eeprom_load_integer(EEPROM_DIR_POSITION);
+
+    if (eepron_position!=position){
+      eeprom_save_integer(EEPROM_DIR_POSITION,position)
+      last_eeprom_time_try_tosave = millis();
+    }
+  }
 }
 
 void setup() {
@@ -661,10 +690,8 @@ void setup() {
 
 
 
+
 void loop(){
-
-
-
 
   readManualController();
   readOtherSensor();

@@ -6,8 +6,8 @@ install:
     - python -c "$(curl -fsSL https://raw.githubusercontent.com/platformio/platformio/master/scripts/get-platformio.py)"
     - wget https://github.com/josemlp91/ardufocuser_firmware/raw/master/Ardufocuser/libs/TimerOne.zip
     - unzip TimerOne.zip
-    - wget https://github.com/josemlp91/ardufocuser_firmware/raw/master/Ardufocuser/libs/lcd.zip
-    - unzip lcd.zip
+    - wget https://github.com/josemlp91/ardufocuser_firmware/raw/master/Ardufocuser/libs/i2clcd.zip
+    - unzip i2clcd.zip
     - wget https://github.com/josemlp91/ardufocuser_firmware/raw/master/Ardufocuser/libs/AccelStepper-1.49.zip
     - unzip AccelStepper-1.49.zip
     - wget https://github.com/josemlp91/ardufocuser_firmware/raw/master/Ardufocuser/libs/nunchuck.zip
@@ -15,4 +15,4 @@ install:
 
 
 script:
-    - platformio ci Ardufocuser --lib="TimerOne" --lib="lcd" --lib="nunchuck" --lib="AccelStepper" --board=uno
+    - platformio ci Ardufocuser --lib="TimerOne" --lib="i2clcd" --lib="nunchuck" --lib="AccelStepper" --board=uno
