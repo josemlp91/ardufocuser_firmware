@@ -12,7 +12,7 @@
     },
 
       "version": "1",
-      "downloadUrl": "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/arduino-timerone/TimerOne-r11.zip",
+      "downloadUrl": "https://github.com/josemlp91/ardufocuser_firmware/raw/master/Ardufocuser/libs/TimerOne.zip",
       "include": "TimerOne",
       "frameworks": "arduino",
       "platforms": "atmelavr"
@@ -32,7 +32,7 @@
     },
 
       "version": "1",
-      "downloadUrl": "http://playground.arduino.cc/uploads/Main/LiquidCrystal.zip",
+      "downloadUrl": "https://github.com/josemlp91/ardufocuser_firmware/raw/master/Ardufocuser/libs/lcd.zip",
       "include": "LiquidCrystal",
       "frameworks": "arduino",
       "platforms": "atmelavr"
@@ -51,7 +51,7 @@
         "url": "http://www.airspayce.com/mikem/arduino/AccelStepper/"
     },
       "version": "1.49 2016-01-02",
-      "downloadUrl": "http://www.airspayce.com/mikem/arduino/AccelStepper/AccelStepper-1.49.zip",
+      "downloadUrl": "https://github.com/josemlp91/ardufocuser_firmware/raw/master/Ardufocuser/libs/AccelStepper-1.49.zip",
       "include": "AccelStepper",
       "frameworks": "arduino",
       "platforms": "atmelavr"
