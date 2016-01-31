@@ -5,14 +5,14 @@ python:
 install:
     - python -c "$(curl -fsSL https://raw.githubusercontent.com/platformio/platformio/master/scripts/get-platformio.py)"
     - wget https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/arduino-timerone/TimerOne-r11.zip
-    - unzip /tmp/TimerOne-r11.zip -d /tmp/
+    - unzip TimerOne-r11.zip
     - wget http://playground.arduino.cc/uploads/Main/LiquidCrystal.zip
-    - unzip /tmp/LiquidCrystal.zip -d /tmp/
+    - unzip LiquidCrystal.zip
     - wget http://www.airspayce.com/mikem/arduino/AccelStepper/AccelStepper-1.49.zip
-    - unzip /tmp/AccelStepper-1.49.zip -d /tmp/
+    - unzip AccelStepper-1.49.zip
     - wget https://github.com/josemlp91/ardufocuser_firmware/raw/master/Ardufocuser/libs/nunchuck.zip
-    - unzip /tmp/nunchuck.zip -d /tmp/
+    - unzip nunchuck.zip
 
 
 script:
-    - platformio ci Ardufocuser --lib="/tmp/TimerOne" --lib="/tmp/LiquidCrystal" --lib="/tmp/nunchuck" --lib="/tmp/AccelStepper" --board=uno
+    - platformio ci Ardufocuser --lib="TimerOne" --lib="LiquidCrystal" --lib="nunchuck" --lib="AccelStepper" --board=uno
