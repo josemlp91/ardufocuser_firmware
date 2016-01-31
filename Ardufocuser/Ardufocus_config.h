@@ -20,7 +20,7 @@
 #define PINLED_WARNING 50
 #define MAX_CHANGE_TEMP 2
 
-/*
+
 #define PINLCD_RS 8
 #define PINLCD_ENABLE 9
 #define PINLCD_D4 4
@@ -28,7 +28,7 @@
 #define PINLCD_D6 6
 #define PINLCD_D7 7
 #define PINBRIGHTNESS 10
-*/
+
 
 #define PINMICROSTEP_MS1 11
 #define PINMICROSTEP_MS2 12
