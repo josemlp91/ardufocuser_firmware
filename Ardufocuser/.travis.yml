@@ -14,6 +14,9 @@ install:
     wget http://www.airspayce.com/mikem/arduino/AccelStepper/AccelStepper-1.49.zip
     unzip /tmp/AccelStepper-1.49.zip -d /tmp/
 
+    wget https://github.com/josemlp91/ardufocuser_firmware/raw/master/Ardufocuser/libs/nunchuck.zip
+    unzip /tmp/nunchuck.zip -d /tmp/
+
 
 script:
-    - platformio ci blink/src --board=uno --board=due --board=teensy31 --board=esp01
+    - platformio ci Ardufocuser --lib="/tmp/TimerOne" --lib="/tmp/LiquidCrystal" --lib="/tmp/nunchuck" --lib="/tmp/AccelStepper" --board=uno

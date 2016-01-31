@@ -75,7 +75,7 @@
          "frameworks": "arduino"
      },
       "version": "1",
-      "downloadUrl": "",
+      "downloadUrl": "https://github.com/josemlp91/ardufocuser_firmware/raw/master/Ardufocuser/libs/nunchuck.zip",
       "include": "nunchuck",
       "frameworks": "arduino",
       "platforms": "atmelavr"
