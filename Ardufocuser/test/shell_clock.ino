@@ -65,7 +65,7 @@ int set_time(int argc, char** argv)
   return SHELL_RET_SUCCESS;
 }
 
-// Comando para cambiar la hora.
+// Comando para consultar la hora.
 int current_time(int argc, char** argv)
 {
   shell_printf(rtc.getTimeStr());

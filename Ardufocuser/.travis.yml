@@ -1,0 +1,19 @@
+language: python
+python:
+    - "2.7"
+
+install:
+    - pip install -U platformio
+
+    wget https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/arduino-timerone/TimerOne-r11.zip
+    unzip /tmp/TimerOne-r11.zip -d /tmp/
+
+    wget http://playground.arduino.cc/uploads/Main/LiquidCrystal.zip
+    unzip /tmp/LiquidCrystal.zip -d /tmp/
+
+    wget http://www.airspayce.com/mikem/arduino/AccelStepper/AccelStepper-1.49.zip
+    unzip /tmp/AccelStepper-1.49.zip -d /tmp/
+
+
+script:
+    - platformio ci blink/src --board=uno --board=due --board=teensy31 --board=esp01

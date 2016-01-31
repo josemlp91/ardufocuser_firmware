@@ -1,0 +1,84 @@
+[
+  {
+    "name": "TimerOne",
+       "keywords": "Timer, , AttachInterrupt, Software Interrupt",
+       "description": "This library is a collection of routines for configuring the 16 bit hardware timer called Timer1 on the ATmega168/328. ",
+
+    "authors":
+    {
+        "name": "Jesse Tane",
+        "email": "mikem@airspayce.com",
+        "url": "http://labs.ideo.com"
+    },
+
+      "version": "1",
+      "downloadUrl": "https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/arduino-timerone/TimerOne-r11.zip",
+      "include": "TimerOne",
+      "frameworks": "arduino",
+      "platforms": "atmelavr"
+
+  },
+
+  {
+    "name": "LiquidCrystal",
+       "keywords": "LCD, Display",
+       "description": "This library allows an Arduino board to control LiquidCrystal displays (LCDs) based on the Hitachi HD44780 (or a compatible) chipset",
+
+    "authors":
+    {
+        "name": "Anonymous",
+        "email": "anonymous@anonymous.com",
+        "url": "http://playground.arduino.cc/Main/LiquidCrystal"
+    },
+
+      "version": "1",
+      "downloadUrl": "http://playground.arduino.cc/uploads/Main/LiquidCrystal.zip",
+      "include": "LiquidCrystal",
+      "frameworks": "arduino",
+      "platforms": "atmelavr"
+
+  },
+
+  {
+    "name": "AccelStepper",
+       "keywords": "Stepper motor, , pololu",
+       "description": "Control devices (from Dallas Semiconductor) that use the One Wire protocol (DS18S20, DS18B20, DS2408 and etc)",
+
+    "authors":
+    {
+        "name": "Mike McCauley",
+        "email": "mikem@airspayce.com",
+        "url": "http://www.airspayce.com/mikem/arduino/AccelStepper/"
+    },
+      "version": "1.49 2016-01-02",
+      "downloadUrl": "http://www.airspayce.com/mikem/arduino/AccelStepper/AccelStepper-1.49.zip",
+      "include": "AccelStepper",
+      "frameworks": "arduino",
+      "platforms": "atmelavr"
+
+  },
+
+  {
+    "name": "Nunchuck",
+       "keywords": "Wii, , Nunchuck",
+       "description": " This library provides an improved derivation of rotation angles from the nunchuck accelerometer data.",
+
+    "authors":
+    {
+        "name": "Tod E. Kurt",
+        "email": "mikem@airspayce.com",
+        "url": "http://playground.arduino.cc/Main/WiiChuckClass"
+    },
+    "dependencies":
+     {
+         "name": "Wire",
+         "frameworks": "arduino"
+     },
+      "version": "1",
+      "downloadUrl": "",
+      "include": "nunchuck",
+      "frameworks": "arduino",
+      "platforms": "atmelavr"
+
+  }
+]
