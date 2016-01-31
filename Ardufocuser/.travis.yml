@@ -1,8 +1,4 @@
-language: python
-python:
-    - "2.7"
-
-before_install:
+install:
     - pip install -U platformio
     - wget https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/arduino-timerone/TimerOne-r11.zip
     - unzip /tmp/TimerOne-r11.zip -d /tmp/
