@@ -29,7 +29,7 @@ LiquidCrystal lcd(PINLCD_RS, PINLCD_ENABLE, PINLCD_D4, PINLCD_D5, PINLCD_D6, PIN
 
 
 // Variable para boton activo en cada momento.
-int button=btnNONE;  
+int button=btnNONE;
 
 // Brillo por defecto.
 int BRIGHTNESS = 50;
@@ -37,7 +37,7 @@ int BRIGHTNESS = 50;
 // Variables para controlar los limites findes de carrera hardware.
 bool limitRunActiveA=false; bool limitRunActiveB=false;
 
-// Variables para controlar los limites fines de carrera software. 
+// Variables para controlar los limites fines de carrera software.
 bool limitRunSoftwareActiveA=false; bool limitRunSoftwareActiveB=false;
 int  limitRunSoftwareA=-300; int  limitRunSoftwareB=300;
 
@@ -47,7 +47,7 @@ int speed = 0;
 // Variable para controlar pasos por cada pulso.
 int stepPerPulse = 0;
 
-// Variable que controla la posición del motor en cada 
+// Variable que controla la posición del motor en cada
 int position;
 
 // Variables para controlar la temperatura.
@@ -71,7 +71,7 @@ long lastTimeReadButton = 0;
 long lastTimeReadController = 0;
 //WorkMode mode;
 
-// Tamaño de los buffer de lectura.              
+// Tamaño de los buffer de lectura.
 const int bSize = 20;
 const int lenghtcommand=10;
 const int lenghtdata=15;
@@ -94,13 +94,13 @@ char data[bSize];       // almacenamos parametro
 int read_LCD_buttons(int adc_key){
 
 //Hacer que estos valores se configuren con una rutina  automatica ...
- if (adc_key > 1000) return btnNONE; 
- if (adc_key < 50)   return btnRIGHT;  
- if (adc_key < 250)  return btnUP; 
- if (adc_key < 450)  return btnDOWN; 
- if (adc_key < 650)  return btnLEFT; 
- if (adc_key < 850)  return btnSELECT;  
- return btnNONE;  
+ if (adc_key > 1000) return btnNONE;
+ if (adc_key < 50)   return btnRIGHT;
+ if (adc_key < 250)  return btnUP;
+ if (adc_key < 450)  return btnDOWN;
+ if (adc_key < 650)  return btnLEFT;
+ if (adc_key < 850)  return btnSELECT;
+ return btnNONE;
 
 }
 
@@ -110,19 +110,19 @@ int read_LCD_buttons(int adc_key){
 */
 void welcome(String msgGreet){
 
-  lcd.begin(16, 2);              
+  lcd.begin(16, 2);
   lcd.setCursor(0,0);
   lcd.print(msgGreet);
   delay(3000);
   lcd.setCursor(0,0);
   lcd.print("                ");
-  
+
 }
 
 /*
 * Funcion que ajusta el brillo de la LCD.
 */
-void setBrightness(int bright){ analogWrite(PINBRIGHTNESS,bright); }  //Brillo del LCD  
+void setBrightness(int bright){ analogWrite(PINBRIGHTNESS,bright); }  //Brillo del LCD
 
 
 /*
@@ -137,35 +137,35 @@ void finB(){ limitRunActiveB=true; }
 /*
  * Bucle principal interrupción software.
  */
-void timerFunction() { 
+void timerFunction() {
 
   position=motor.currentPosition();
-    
+
     if (position == limitRunSoftwareA) {
-        // Solo permitirmos movimiento en el sentido opuesto al límite.         
+        // Solo permitirmos movimiento en el sentido opuesto al límite.
          if (motor.targetPosition() > limitRunSoftwareA)
            { motor.run(); limitRunSoftwareActiveA=false;  position=motor.currentPosition();}
-           
-         else 
+
+         else
           {  motor.moveTo(limitRunSoftwareA);  limitRunSoftwareActiveA=true;}
-          
+
       }
 
        if (position == limitRunSoftwareB) {
           // Solo permitirmos movimiento en el sentido opuesto al límite.
          if (motor.targetPosition() < limitRunSoftwareB)
           { motor.run(); limitRunSoftwareActiveB=false;  position=motor.currentPosition(); }
-          
-         else 
+
+         else
            { motor.moveTo(limitRunSoftwareB);   limitRunSoftwareActiveB=true; }
-          
+
        }
 
        // Si no se cumple ninguna condición permitir girar libremente.
       else {motor.run(); position=motor.currentPosition();}
 
 
-     
+
 }
 
 /*
@@ -204,45 +204,45 @@ void readManualController(){
      if (s==0) hadToReadspeed=true;
 
      if (hadToReadspeed){
-        speed = map(s, 0, 1024, MINVEL, MAXVEL ); 
+        speed = map(s, 0, 1024, MINVEL, MAXVEL );
      }
 
      // Cuando bajoamos el potenciometro al valor 0 forzamos a actualizar los pasos por pulso.
      int sS = analogRead(PIN_POTB);
-     if (sS==0) hadToReadstepPerPulse=true; 
+     if (sS==0) hadToReadstepPerPulse=true;
 
-     if (hadToReadstepPerPulse){  
+     if (hadToReadstepPerPulse){
         stepPerPulse = map(sS, 0, 1024, 1, MAXSTEPPXPULSA);
-     }  
+     }
 
      if (abs(motor.speed() - speed ) > 2) {
        motor.setMaxSpeed(speed);
      }
 
-     // Refrescamos momento de actualización. 
+     // Refrescamos momento de actualización.
      lastTimeReadController = millis();
     }
 }
 
 
 /*
-* Lee otros sensores o perifericos.v 
+* Lee otros sensores o perifericos.v
 */
 void readOtherSensor(){
  // Other Sensor
  //limitRunActiveA=digitalRead(PIN_LIMITRUNA);
  //limitRunActiveB=digitalRead(PIN_LIMITRUNB);
  //limitRunActiveA=limitRunActiveB=false;
-  
+
 }
 
 
 /*
-* Lee la temperatura. 
+* Lee la temperatura.
 */
 long lastTimeReadTemp = 0;
 float readTemperature(){
- 
+
   if (millis() > lastTimeReadTemp + 10000) {
 
       float t;
@@ -257,7 +257,7 @@ float readTemperature(){
 }
 
 /*
-* Actualiza mensajes que se muestran por pantalla LCD. 
+* Actualiza mensajes que se muestran por pantalla LCD.
 */
 long lastTimeUpdateLcd = 0;
 void updateLCD(){
@@ -278,7 +278,7 @@ void updateLCD(){
         case btnUP:     lcd.print("RIGHT_F");  break;
         case btnDOWN:   lcd.print("LEFT_F ");  break;
         case btnSELECT: lcd.print("OK     ");  break;
-    
+
       // Actualizamos boton anterior al boton actual.
       lastPulse=button;
 
@@ -295,7 +295,7 @@ void updateLCD(){
        lcd.print("TEMP:   ");
        lcd.setCursor(5,0);
        lcd.print((int)temp_average);
-        
+
        // si se produce un cambio significativo en el control de la velocidad.
        //if ((lastspeed>speed+1) or (lastspeed<speed-1))  {
          // Actualizar zona LCD donde se muestra la velocidad.
@@ -305,23 +305,23 @@ void updateLCD(){
          lcd.print(speed);
          lastspeed=speed;
        //}
-      
+
        // Si se produce un cambio significativo en el control de los pasos por pulso.
        //if ((laststepPerPulse>stepPerPulse+1) or (laststepPerPulse<stepPerPulse-1))  {
          // Actualizar zona LCD donde se muestran los pasos por pulso.
-         
+
          lcd.setCursor(0,1);
          lcd.print("ST:   ");
          lcd.setCursor(3,1);
          lcd.print(stepPerPulse);
          laststepPerPulse=stepPerPulse;
-      //}  
-        
+      //}
+
        // Si se produce un cambio significativo en la posicion.
        //if ((lastposition>position+1) or (lastposition<position-1)){
          // Actualizar zona LCD donde se muestran la posición.
          lcd.setCursor(8,0);
-         lcd.print("POS:    ");    
+         lcd.print("POS:    ");
          lcd.setCursor(12,0);
          lcd.print(position);
          lastposition=position;
@@ -331,7 +331,7 @@ void updateLCD(){
      // Refrescamos momento de actualizacion.
      lastTimeUpdateLcd = millis();
   }
-  }      
+  }
 
 }
 
@@ -348,7 +348,7 @@ void updateLCD(){
 //       Serial.println(temp_average);
 //       for (int i = 0; i<10; ++i){
 //         temp_average+=lastTemp[i];
-        
+
 
 //       }
 //       temp_average/=10;
@@ -380,32 +380,32 @@ void manualPerformance(){
   position=motor.currentPosition();
 
   if (changeThermalOptical(temp_average, temp_perform)) enable_warning();
-     
+
   switch (button){
 
     case btnNONE: {
 
-                    if ((lastPulse==btnLEFT)||(lastPulse==btnRIGHT)){  
-                      motor.stop(); 
+                    if ((lastPulse==btnLEFT)||(lastPulse==btnRIGHT)){
+                      motor.stop();
                     }
                    lastPulse=btnNONE;
-                   
+
                    break;
-      
+
     }
 
     case btnRIGHT: {
-                   
+
                     motor.moveTo(motor.currentPosition()-3000);
-                    lastPulse=btnRIGHT; 
-                    
+                    lastPulse=btnRIGHT;
+
                     break;
     }
 
     case btnLEFT:   {
-                      motor.moveTo(motor.currentPosition()+3000); 
-                      lastPulse=btnLEFT; 
-                     
+                      motor.moveTo(motor.currentPosition()+3000);
+                      lastPulse=btnLEFT;
+
                       break;
     }
 
@@ -413,9 +413,9 @@ void manualPerformance(){
                     if (lastPulse!=btnUP){
                         motor.moveTo(motor.currentPosition() + stepPerPulse);
                     }
-                    
+
                     lastPulse=btnUP;
-                     
+
                     break;
     }
 
@@ -423,9 +423,9 @@ void manualPerformance(){
                     if (lastPulse!=btnDOWN){
                         motor.moveTo(motor.currentPosition() - stepPerPulse);
                     }
-                    
-                    lastPulse=btnDOWN; 
-                    
+
+                    lastPulse=btnDOWN;
+
                     break;
     }
 
@@ -433,18 +433,18 @@ void manualPerformance(){
                       temp_perform=temp_average;
                       disable_warning();
                       motor.setCurrentPosition(0);
-                           
+
                       break;
     }
 
-  } 
+  }
 
   button=btnNONE;
 }
 
 
 /*
-* Parseer del comando que se comunica por el puerto serie, 
+* Parseer del comando que se comunica por el puerto serie,
 * el formato siempre es CMD?DATA    <comando + delimitador + datos>
 *
 * Pasamos como parametro el delimitador.
@@ -465,27 +465,27 @@ void serialParser(char delimiter) {
     // Si hemos leido algun dato.
     if (byteCount  > 0) {
 
-        char c;          
+        char c;
         int i=0;
         // Volcamos contenido del buffer en el contenedor del comando, buscando el delimitador.
         for (i; ((i<byteCount) and (c!= delimiter)) ; i++){
               c=buffer[i];
               if (c!= delimiter) command[i]=c;
-              
+
         }
 
         int a=0;
-         // Volcamos contenido del buffer en el contenedor del dato.  
+         // Volcamos contenido del buffer en el contenedor del dato.
         for (i; (i<byteCount) ; i++){
           c=buffer[i];
 
           if ( c>47 && c < 123) data[a]=c;
           a++;
-      }                  
+      }
     }
 
    //Limpiamos el buffer
-   memset(buffer, 0, bSize);  
+   memset(buffer, 0, bSize);
 }
 
 
@@ -495,33 +495,33 @@ void confirmPositionGet(int pos){}
 // Dada la lectura serie, carga el comando y el dato.
 void remoteManager(){
 
-  //if (mode!=MANUAL){ 
+  //if (mode!=MANUAL){
     char  d='?';
     serialParser(d);
 
     if (byteCount  > 0) {
-      
+
       if      (command[0]=='F'){ /*Implementar*/ }           // Si detectamos comando del repertorio de instrucciones del Robofocus.
       else if (command[0]=='A'){  driveCommandArdufocus(); } // Si detectamos comando del repertorio de instrucciones del Ardufocuser.
       else    Serial.println("No comando");                  // No pertenece a ningun repertorio de instrucciones.
-      
-    //En modo debug: Hacemos eco de los comandos que recibe para depurar que se estan tratando correctamente.  
+
+    //En modo debug: Hacemos eco de los comandos que recibe para depurar que se estan tratando correctamente.
     if (DEBUG){
       Serial.print("CMD      : ");
       Serial.println(command);
       Serial.print("PAR      : ");
       Serial.println(data);
-      Serial.flush();                      
-    }       
+      Serial.flush();
+    }
   }
 
-  //Limpiamos contenedor del comando. 
+  //Limpiamos contenedor del comando.
   memset(command, 0, sizeof(command));
   //Limpiamos contenedor de los datos.
   memset(data, 0, sizeof(data));
   // Reseteamos contador de bytes leidos.
-  byteCount=0;                         
-        
+  byteCount=0;
+
   //}
 
  }
@@ -539,10 +539,10 @@ void sendMessageToIndi(String message){
   Serial.println(message);
   Serial.flush();
 
-} 
+}
 
 /*
-* Maneja comandos Ardofocuser. 
+* Maneja comandos Ardofocuser.
 * Dado el comando y el dato, actua sobre el motor, lcd, sensores o controles segun proceda.
 */
 void driveCommandArdufocus(){
@@ -565,10 +565,10 @@ void driveCommandArdufocus(){
   else if (!(strcmp (command,allcmdArdu[AVERS]))   )   { ardufocuser_command_function_AVERS();     }
   else if (!(strcmp (command,allcmdArdu[AMOV]))  )     { ardufocuser_command_function_AMOV();      }
   else if (!(strcmp (command,allcmdArdu[ARUNA])) )     { ardufocuser_command_function_ARUNA();     }
-  else if (!(strcmp (command,allcmdArdu[ARUNB])))      { ardufocuser_command_function_ARUNB();     } 
+  else if (!(strcmp (command,allcmdArdu[ARUNB])))      { ardufocuser_command_function_ARUNB();     }
   else if (!(strcmp (command,allcmdArdu[ASTOP])))      { ardufocuser_command_function_ASTOP();      }
   else if (!(strcmp (command,allcmdArdu[ALUX])))      { ardufocuser_command_function_ALUX();      }
-  
+
 }
 
 
@@ -577,8 +577,8 @@ void sendCurrentposition(){
 
   if (millis()> lastCurrentPos + 1000){
     String r(motor.currentPosition());
-    sendMessageToIndi("APOSITION?"+ r); 
-  
+    sendMessageToIndi("APOSITION?"+ r);
+
     if (motor.distanceToGo() == 0) { sendMessageToIndi("ASTOP?"); }
   lastCurrentPos=millis();
   }
@@ -590,36 +590,36 @@ void sendCurrentposition(){
  */
 void nunckuckController(){
 
-  chuck.update(); 
-   
+  chuck.update();
+
 
   if (chuck.rightJoy()){
     if (chuck.zPressed()){
       motor.moveTo(limitRunSoftwareB);
     }
-    
+
     else if (lastPulse2!=btnDOWN){
-          motor.moveTo(motor.currentPosition() + stepPerPulse);         
+          motor.moveTo(motor.currentPosition() + stepPerPulse);
     }
-    
-      lastPulse2=btnDOWN;  
+
+      lastPulse2=btnDOWN;
   }
-   
+
    else if  (chuck.leftJoy()){
      if (chuck.zPressed()){
         motor.moveTo(limitRunSoftwareA);
       }
-            
+
       else if (lastPulse2!=btnUP){
         motor.moveTo(motor.currentPosition() - stepPerPulse);
-      }  
-      
-        lastPulse2=btnUP; 
-     
+      }
+
+        lastPulse2=btnUP;
+
    }
 
    else  {
-    lastPulse2=btnNONE; 
+    lastPulse2=btnNONE;
     motor.moveTo(motor.currentPosition());
    // motor.stop();
 
@@ -637,10 +637,10 @@ void setup() {
   Serial.begin(9600);
 
   // Habilitamos salidas para seleccionar micropasos.
-  pinMode(PINMICROSTEP_MS1, OUTPUT); 
-  pinMode(PINMICROSTEP_MS2, OUTPUT); 
+  pinMode(PINMICROSTEP_MS1, OUTPUT);
+  pinMode(PINMICROSTEP_MS2, OUTPUT);
   pinMode(PINMICROSTEP_MS3, OUTPUT);
-  
+
   //Configuracion pines entrada salida.
   pinMode(PINLED_WARNING, OUTPUT);
 
@@ -657,13 +657,13 @@ void setup() {
 
   //Interrupciones software y hardware.
   Timer1.initialize(50);
-  Timer1.attachInterrupt( timerFunction );                                         
-//         attachInterrupt ( 0, finA,RISING);   
+  Timer1.attachInterrupt( timerFunction );
+//         attachInterrupt ( 0, finA,RISING);
 //         attachInterrupt ( 1, finB,RISING);
 
   //Ajustamos el brillo y saludo inicial.
    setBrightness(BRIGHTNESS);
-   welcome("  ARDUFOCUSER"); 
+   welcome("  ARDUFOCUSER");
 
 }
 
@@ -671,7 +671,7 @@ void setup() {
 
 void loop(){
 
-  
+
 
 
   readManualController();
@@ -679,9 +679,7 @@ void loop(){
   //readTemperature();
   updateLCD();
   //manualPerformance();
-  sendCurrentposition();  
-  remoteManager(); 
+  sendCurrentposition();
+  remoteManager();
   //nunckuckController();
 }
- 
-
