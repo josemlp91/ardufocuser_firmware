@@ -1,0 +1,34 @@
+Leyenda: 
+
+Motos: 
+STEP_PIN: AZUL-PIN D5
+DIR_PIN:   ROSA - PIN D6
+
+Bumper Sensor:
+BUMP1: BLANCO PIN D3
+BUMP2: NARANJA PIN D2
+
+Thermal Sensor:
+TSENSR: CIAN PIN A0
+
+I2C:
+SCL: AMARILLO A5
+SCA: VERDE A4
+
+POTENCIOMETER:
+POT1: CAFE A2
+POT2: AZUL A1
+
+LED INDICADOR:
+LED: GRIS PIN 8
+
+ROJO:      5V
+NEGRO:  TIERRA
+
+Nota 2: 
+
+Las dos resistencias que quedan en el circuito si
+no recuerdo mál son dos resistencias PULL_UP para los bumper
+
+El sensor LM35 no necesita de resitencias adicionales, solo respetar la polaridad (5v y tierra), terminal centrar a lectura analogica.
+
