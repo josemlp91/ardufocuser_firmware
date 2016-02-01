@@ -24,7 +24,19 @@ int speed = 0;
 int stepPerPulse = 0;
 
 // Variable que controla la posición del motor en cada
-int position;
+int position=0;
+
+// Tamaño de los buffer de lectura.
+const int bSize = 20;
+const int lenghtcommand=10;
+const int lenghtdata=15;
+
+// Parametros para controlar lectura serie.
+int byteCount;
+char buffer[bSize];     // buffer
+char command[bSize];    // almacenamos comando
+char data[bSize];       // almacenamos parametro
+
 
 #include "DummyArdufocus_cmd.h"
 
@@ -140,9 +152,6 @@ void driveCommandArdufocus(){
   else if (!(strcmp (command,allcmdArdu[ASOLIMIT])))   { ardufocuser_command_function_ASOLIMIT();  }
   else if (!(strcmp (command,allcmdArdu[AVERS]))   )   { ardufocuser_command_function_AVERS();     }
   else if (!(strcmp (command,allcmdArdu[AMOV]))  )     { ardufocuser_command_function_AMOV();      }
-  else if (!(strcmp (command,allcmdArdu[ARUNA])) )     { ardufocuser_command_function_ARUNA();     }
-  else if (!(strcmp (command,allcmdArdu[ARUNB])))      { ardufocuser_command_function_ARUNB();     }
-  else if (!(strcmp (command,allcmdArdu[ASTOP])))      { ardufocuser_command_function_ASTOP();      }
   else if (!(strcmp (command,allcmdArdu[ALUX])))       { ardufocuser_command_function_ALUX();      }
 
 }
@@ -152,11 +161,9 @@ long lastCurrentPos= millis();
 void sendCurrentposition(){
 
   if (millis()> lastCurrentPos + 1000){
-    String r(motor.currentPosition());
-    sendMessageToIndi("APOSITION?"+ r);
-
-  if (motor.distanceToGo() == 0) { sendMessageToIndi("ASTOP?"); }
-  lastCurrentPos=millis();
+    String pp(position);
+    sendMessageToIndi("APOSITION?"+pp);
+    lastCurrentPos=millis();
   }
 
 }
@@ -164,6 +171,7 @@ void sendCurrentposition(){
 
 void setup() {
   Serial.begin(9600);
+  position=100;
 }
 
 

@@ -68,7 +68,7 @@ void ardufocuser_command_function_AMODE(){
 // Mueve motor hasta la psocición pasada como parametro.
 void ardufocuser_command_function_AG(){
 	int Ipar=atoi(data);
-
+	/*
 		if (position > Ipar){
 			while(position > Ipar){
 				position--;
@@ -80,6 +80,11 @@ void ardufocuser_command_function_AG(){
 				delay(1000);
 			}
 		}
+		*/
+		position=Ipar;
+		String posA(position);
+		sendMessageToIndi("APOSITION?"+position);
+
 }
 
 // Envia mensaje indicando posición.
@@ -115,7 +120,6 @@ void ardufocuser_command_function_ASPEED(){
      if (Ivel<MINVEL) Ivel=MINVEL;
      speed=Ivel;
      String vel(Ivel);
-     hadToReadspeed=false;
      sendMessageToIndi("ASPEED?"+vel);
 }
 
@@ -174,7 +178,8 @@ void ardufocuser_command_function_ASOLIMIT(){
 // Modifica brillo de la pantalla LCD
 void ardufocuser_command_function_ALUX(){
 	  int Ilux=atoi(data);
-	  setBrightness(Ilux);
+		sendMessageToIndi("ALUX?1");
+
 }
 
 // Consulta version del software.
