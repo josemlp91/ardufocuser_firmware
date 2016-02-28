@@ -1,14 +1,19 @@
 /// Inicializamos el sistema.
 
+
 // Iniciamos nunchuck
-//WiiChuck chuck = WiiChuck();
+WiiChuck chuck = WiiChuck();
 
 // Inicializa controlador POLOLU
-//AccelStepper motor(1, PINSTEP, PINDIR);
+AccelStepper motor(1, PINSTEP, PINDIR);
 
 // Inicializa LCD I2C en canal 27.
 LiquidCrystal_I2C lcd(0x27, LCD_COLUMNS, LCD_ROWS);
 
+
+
+
+///////////////////////////////////////////////////////////////////////////////////
 // Variables para controlar los limites findes de carrera hardware/software.
 bool limitRunActiveA=false; bool limitRunActiveB=false;
 bool limitRunSoftwareActiveA=false; bool limitRunSoftwareActiveB=false;
@@ -21,11 +26,12 @@ int speed = 0;
 int stepPerPulse = 0;
 
 // Variable que controla la posición del motor en cada
-
+int position;
 
 // Variables para controlar la temperatura.
 int temperature=0;
 
+/////////////////////////////////////////////////
 // Tiempos del último refesco.
 unsigned long lastTimeUpdate=0;
 

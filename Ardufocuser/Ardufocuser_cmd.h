@@ -1,6 +1,11 @@
 //Definimos los indices de cada comando.
 //OJO: Para añadir un comando debemos asegurarnos que lo añadimos en la posición que corresponde con su indice.
 
+
+// Instancia de SerialCommand, tokenizador y parseador de puerto serie.
+SerialCommand serial_cmd; 
+
+
 #define AINIT   				0    // Iniciar modo funcionamiento Ardufocuser.
 #define AMODE   				1    // Estableceer modo de funcionamiento.
 #define AG   		  			2    // Mover enfocador hasta posición pasada como dato.
@@ -23,122 +28,140 @@
 #define ASTOP   			   19    // Comando para debug: Detiene motor del enfocador
 #define ALUX   	               20    // Modifica la intesindad de la ilumincaicon de la pantalla.
 #define ACALIBRATE   	       21    // Configura los limites software.
+#define ALCDPRINT   	       22    // Imprime mensaje en lcd
 
 
-bool char_is_ascii_letter(char c)
-{
-	return  (c >= int('a') || c <=int('z'));
-}
 
-bool char_is_ascii_number(char c)
-{
-	return  (c >= int('1') || c <=int('9'));
-}
-
-bool char_is_ascii_letter_or_number(char c)
-{
-	return (char_is_ascii_letter(c) || char_is_ascii_number(c));
-}
-
-
-int string_to_int(String c)
-{
-	return c.toInt();
-}
-
-/*
-
-String global_input_string = "";
-String global_command = ""; 
-String global_arg = "";  
-boolean global_flag_string_is_complete = false;
-
-// Evento serie, se ejecuta dado un evento serie.
-void serialEvent() {
-
-  // Delimitador entre comando y parametro.
-  char cmd_arg_separator='?';
-  int separator_index;	
-
-  while (Serial.available()) {
-    // Leemos caracter por caracter.
-    char in_char = (char)Serial.read();
-    global_input_string += in_char;
-    
-    if (in_char == '\n') {
-      global_flag_string_is_complete = true;
-      
-      separator_index = global_input_string.indexOf(cmd_arg_separator);
-      global_command = global_input_string.substring(0, separator_index);
-      global_arg = global_input_string.substring(separator_index+1, global_input_string.length());
-      
-
-      lcd.clear();
-      lcd.print(global_command);
-      lcd.print(" ");
-      lcd.print(global_arg);
-
-    }
-  }
-}
-
-*/
 
 
 
 // Ajusta modo autofocus.
-/*
-int ardufocuser_command_function_AINIT(int argc, char** argv){
+void ardufocuser_command_function_AINIT()
+{
    char charBuf[50];
+   String str_mode;
+   String str_cmd;
+
+   // Establece modo de funcionamiento.   
+   mode = ARDUFOCUS_MODE;
    
-   mode = 1;
-   
-   String str_mode = String(mode);
-   String str_cmd = String("AINIT " + str_mode );
+   str_mode = String(mode);
+   str_cmd = String("AINIT?" + str_mode );
    str_cmd.toCharArray(charBuf, 50); 
    
-   shell_printf(charBuf);
-   return SHELL_RET_SUCCESS;
+   Serial.println(str_cmd); 
+
 }
-*/
 
-/*
- int ardufocuser_command_function_ALCD_PRINT(int argc, char** argv)
-  {
-    if (argc > 1){
-      String str=argv[1];
-      lcd.clear();
-      lcd.print(str);
-      return SHELL_RET_SUCCESS;
-    }
+
+void ardufocuser_command_function_ALCD_PRINT()
+{
+    char charBuf[50];
+	String str_cmd;
+	char *arg;  
+
+	arg = serial_cmd.next();
+
+  if (arg != NULL) {
+   
+    lcd.clear();
+    lcd.print(arg);
+    
+    str_cmd = String("ALCDPRINT");
+	str_cmd.toCharArray(charBuf, 50); 
+	Serial.println(str_cmd); 
+
   }
-*/
+  else {
+    Serial.println("No arguments");
+  }
+}
 
-/*
-int ardufocuser_command_function_AMODE(int argc, char** argv){
 
+
+void ardufocuser_command_function_AMODE()
+{
+	
 	char charBuf[50];
 	String str_mode;
 	String str_cmd;
 
-	if (argc > 0){
-		str_mode = String(argv[1]);
-		mode = str_mode.toInt();
-		str_cmd = String("AMODE " + str_mode );
-	   	str_cmd.toCharArray(charBuf, 50); 
-		shell_printf(charBuf);
-	}
+	int aNumber;
+	char *arg;  
 
-	else {
-	   str_mode = String(mode);
-	   str_cmd = String("AMODE " + str_mode );
+	arg = serial_cmd.next();
+
+  if (arg != NULL) {
+    aNumber = atoi(arg);
+	mode = aNumber;
+	str_mode = arg;
+
+	str_cmd = String("AMODE?" + str_mode );
+   	str_cmd.toCharArray(charBuf, 50); 
+	Serial.println(str_cmd); 
+  }
+
+  else {
+       str_mode = String(mode);
+	   str_cmd = String("AMODE?" + str_mode );
 	   str_cmd.toCharArray(charBuf, 50); 
-	   shell_printf(charBuf);
-	}
+	   Serial.println(str_cmd);
+  }
 
-	return SHELL_RET_SUCCESS;
 }
+
+
+
+/*
+void  function_GETCOUNT()
+{
+	char charBuf[50];
+	String str_position;
+	String str_cmd;
+  
+	str_position = String(count);
+
+	str_cmd = String("AG?" + str_position );
+	str_cmd.toCharArray(charBuf, 50); 
+	Serial.println(str_cmd);	
+}
+
+
+
+void function_SETCOUNT() 
+{
+	
+	char charBuf[50];
+	String str_position;
+	String str_cmd;
+	int aNumber;
+	char *arg;  
+
+	arg = serial_cmd.next();
+
+  if (arg != NULL) {
+    aNumber = atoi(arg);
+
+    count=aNumber;
+
+    str_position = String(count);
+    str_cmd = String("AG?" + str_position );
+	str_cmd.toCharArray(charBuf, 50); 
+	Serial.println(str_cmd); 
+
+  }
+  else {
+    Serial.println("No arguments");
+  }
+
+}
+
 */
+
+
+
+
+
 
 /*
 // Mueve motor hasta la psocición pasada como parametro.
@@ -331,3 +354,33 @@ void registerCommand(){
   //..
 }
 */
+
+
+
+// Incializa parseador de comandos con sus correspondientes funciones asociadas.
+void registerCommand(){
+
+  serial_cmd.addCommand("AINIT", ardufocuser_command_function_AINIT);
+  serial_cmd.addCommand("AMODE", ardufocuser_command_function_AMODE);
+  serial_cmd.addCommand("ALCDPRINT", ardufocuser_command_function_ALCD_PRINT);
+  // serial_cmd.addCommand("AG", function_SETCOUNT);
+  // serial_cmd.addCommand("APOSITION", function_GETCOUNT);
+  // serial_cmd.addCommand("ALTEMP", function_SETCOUNT);
+  // serial_cmd.addCommand("AMICRO", function_SETCOUNT);
+  // serial_cmd.addCommand("AFINE", function_GETCOUNT);
+  // serial_cmd.addCommand("ASPEED", function_SETCOUNT);
+  // serial_cmd.addCommand("AR", function_SETCOUNT);
+  // serial_cmd.addCommand("AHLIMIT", function_GETCOUNT);
+  // serial_cmd.addCommand("ASLIMIT", function_SETCOUNT);
+  // serial_cmd.addCommand("ASILIMIT", function_SETCOUNT);
+  // serial_cmd.addCommand("ASOLIMIT", function_GETCOUNT);
+  // serial_cmd.addCommand("AVERS", function_SETCOUNT);
+  // serial_cmd.addCommand("AMOV", function_SETCOUNT);
+  // serial_cmd.addCommand("ARUNA", function_GETCOUNT);
+  // serial_cmd.addCommand("ARUNB", function_SETCOUNT);
+  // serial_cmd.addCommand("ASTOP", function_SETCOUNT);
+  // serial_cmd.addCommand("ALUX", function_SETCOUNT);
+  // serial_cmd.addCommand("ACALIBRATE", function_SETCOUNT);
+
+
+}

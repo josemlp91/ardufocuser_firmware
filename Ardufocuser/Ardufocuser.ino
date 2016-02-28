@@ -3,19 +3,25 @@
 #define DEBUG 0
 #define ENABLE_LCD 1
 
+
+
 #include <TimerOne.h>
-#include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include <SerialCommand.h>
+#include <AccelStepper.h>
+
+#include <Wire.h>
+#include <math.h>
+#include <nunchuck.h>
+#include <EEPROM.h>
+
+#include "Ardufocuser_config.h"
+#include "Ardufocuser_init.h"
+#include "Ardufocuser_cmd.h"
+#include "Ardufocuser_utils.h"
 
 
-LiquidCrystal_I2C lcd(0x27, 16, 2);
-SerialCommand serial_cmd; 
-
-unsigned long lastTimeUpdate=0;
-int refresh_rate=1000;
-
-int count=0;   
+int count=0;
 
 void setup()
 {
@@ -23,9 +29,7 @@ void setup()
   lcd.begin();
   lcd.backlight();
 
-  serial_cmd.addCommand("GETCOUNT", function_GETCOUNT);
-  serial_cmd.addCommand("SETCOUNT", function_SETCOUNT);
-
+  registerCommand();
 }
 
 
@@ -43,46 +47,5 @@ void loop()
 }
 
 
-void  function_GETCOUNT()
-{
-	char charBuf[50];
-	String str_position;
-	String str_cmd;
-  
-	str_position = String(count);
 
-	str_cmd = String("AG?" + str_position );
-	str_cmd.toCharArray(charBuf, 50); 
-	Serial.println(str_cmd);	
-}
-
-
-
-void function_SETCOUNT() 
-{
-	
-	char charBuf[50];
-	String str_position;
-	String str_cmd;
-	int aNumber;
-	char *arg;  
-
-	arg = serial_cmd.next();
-
-  if (arg != NULL) {
-    aNumber = atoi(arg);
-
-    count=aNumber;
-
-    str_position = String(count);
-    str_cmd = String("AG?" + str_position );
-	str_cmd.toCharArray(charBuf, 50); 
-	Serial.println(str_cmd); 
-
-  }
-  else {
-    Serial.println("No arguments");
-  }
-
-}
 

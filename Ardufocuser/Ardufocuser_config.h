@@ -63,9 +63,12 @@
 # define LCD_COLUMNS 16
 
 
-# define MODE1 1
-# define MODE2 2
-# define MODE3 3
+# define ARDUFOCUS_MODE 1
+# define ROBOFOCUS_MODE 2
+# define ONLY_MANUAL 3
+# define OTHER_MODE 4
+
+
 
 
 const int btnRIGHT=0;
