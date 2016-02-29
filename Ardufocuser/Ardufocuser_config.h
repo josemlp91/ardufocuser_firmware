@@ -1,7 +1,6 @@
 
 // DEFAULT VALUES.
 
-
 // Máximo valor para el control de pasos por pulso.
 #define MAXSTEPPXPULSA   100
 
@@ -67,8 +66,6 @@
 # define ROBOFOCUS_MODE 2
 # define ONLY_MANUAL 3
 # define OTHER_MODE 4
-
-
 
 
 const int btnRIGHT=0;

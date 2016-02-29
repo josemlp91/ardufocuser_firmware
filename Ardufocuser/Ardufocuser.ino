@@ -3,8 +3,6 @@
 #define DEBUG 0
 #define ENABLE_LCD 1
 
-
-
 #include <TimerOne.h>
 #include <LiquidCrystal_I2C.h>
 #include <SerialCommand.h>
@@ -48,6 +46,9 @@ void timerFunction() {
 
 	// Si no se cumple ninguna condición permitir girar libremente.
 	else {motor.run(); position=motor.currentPosition();}
+
+	// DEBUG:
+	//motor.run(); position=motor.currentPosition();
 }
 
 
@@ -64,8 +65,9 @@ void read_manual_controller(){
 
      // Cuando bajoamos el potenciometro al valor 0 forzamos a actualizar la velocidad.
      // Esto se hace así para contemplar la posibilidad de que se esten modificando los valores de forma remota.
+     
      if (potA==0) hadToReadspeed=true;
-     if (hadToReadspeed){ speed = map(potA, 0, 1024, MINVEL, MAXVEL ); }
+     if (hadToReadspeed){ speed = map(potA, 0, 1024, MINVEL, MAXVEL ); motor.setMaxSpeed(speed); }
 
      // Cuando bajamos el potenciometro al valor 0 forzamos a actualizar los pasos por pulso.
      // Esto se hace así para contemplar la posibilidad de que se esten modificando los valores de forma remota.
@@ -73,14 +75,11 @@ void read_manual_controller(){
      if (potB==0) hadToReadstepPerPulse=true;
      if (hadToReadstepPerPulse){ stepPerPulse = map(potB, 0, 1024, 1, MAXSTEPPXPULSA); }
 
-     // TODO : SINCERAMENTE NO SE LO QUE HACE.
-     if (abs(motor.speed() - speed ) > 2) { motor.setMaxSpeed(speed); }
-
      lastTimeReadManualController = millis() + manual_controller_refresh_rate;
     }
 }
 
-
+// Refresca LCD
 void update_lcd_display(){
 
   // Si cumple el tiempo minimo de refresco.
@@ -167,7 +166,7 @@ void comunicate_current_position(){
 
 
 // Controlador WiiNunckuck para Ardufocuser
-void nunckuckController(){
+void nunckuck_controller(){
 
   chuck.update();
   if (chuck.rightJoy()){
@@ -175,10 +174,10 @@ void nunckuckController(){
       motor.moveTo(limitRunSoftwareB);
     }
 
-    else if (lastPulse2!=btnDOWN){
+    else if (lastPulse!=btnDOWN){
           motor.moveTo(motor.currentPosition() + stepPerPulse);
     }
-      lastPulse2=btnDOWN;
+      lastPulse=btnDOWN;
   }
 
    else if  (chuck.leftJoy()){
@@ -186,53 +185,68 @@ void nunckuckController(){
         motor.moveTo(limitRunSoftwareA);
       }
 
-      else if (lastPulse2!=btnUP){
+      else if (lastPulse!=btnUP){
         motor.moveTo(motor.currentPosition() - stepPerPulse);
       }
-        lastPulse2=btnUP;
+        lastPulse=btnUP;
    }
 
    else  {
-    lastPulse2=btnNONE;
+    lastPulse=btnNONE;
     motor.moveTo(motor.currentPosition());
-   // motor.stop();
-
    }
 
 }
 
 
+//saludo inicial.
+void welcome(char* msg)
+{
+  lcd.setCursor(0,0);
+  lcd.print(msg);
+  delay(1000);
+  lcd.setCursor(0,0);
+  lcd.clear();
+}
+
 
 
 void setup()
 {
-  Serial.begin(4800);
+
+  Serial.begin(9600);
+  
+  // iniciamos lcd
   lcd.begin();
   lcd.backlight();
+  
+  // saludo
+  welcome("   ARDUFOCUSER  ");
+
+  // velocidad y aceletación por defecto.
+  motor.setMaxSpeed(200);
+  motor.setAcceleration(1000);
+  
+  //Iniciamos nunckuck
+  chuck.begin();
+  chuck.update();
+
+  // iniciamos interrupciones software.
+  Timer1.initialize(50);
+  Timer1.attachInterrupt( timerFunction );
+  
   registerCommand();
+ 
 }
 
 
 void loop()
 {
   	serial_cmd.readSerial();
-
   	read_manual_controller();
   	update_lcd_display();
-  	comunicate_current_position();
-
-  	/*
-	if (millis() > lastTimeUpdate) {
-	  lcd.clear();
-      lcd.print(count);
-      
-	  lastTimeUpdate = millis() + refresh_rate;
-	  count+=1;
-	  serial_cmd.clearBuffer();
-	}
-
-	*/
-
+  	//comunicate_current_position();
+  	//nunckuck_controller();
 
 }
 

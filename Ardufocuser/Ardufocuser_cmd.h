@@ -1,11 +1,10 @@
 //Definimos los indices de cada comando.
-//OJO: Para añadir un comando debemos asegurarnos que lo añadimos en la posición que corresponde con su indice.
-
 
 // Instancia de SerialCommand, tokenizador y parseador de puerto serie.
 SerialCommand serial_cmd; 
 
 
+// Esto ya no es necesario.
 #define AINIT   				0    // Iniciar modo funcionamiento Ardufocuser.
 #define AMODE   				1    // Estableceer modo de funcionamiento.
 #define AG   		  			2    // Mover enfocador hasta posición pasada como dato.
@@ -171,10 +170,8 @@ void ardufocuser_command_function_AFINE(){
 		if (aNumber>MAXSTEPPXPULSA){ stepPerPulse=MAXSTEPPXPULSA; }
     	else if (aNumber<1){  stepPerPulse=1; }
     	else{ stepPerPulse = aNumber; }
-		str_step_per_pulse=String(stepPerPulse);
-
-		// TODO: 
-		// hadToReadstepPerPulse=false;
+		str_step_per_pulse=String(stepPerPulse); 
+		hadToReadstepPerPulse=false;
 	}
 
 	else{ str_step_per_pulse=String(stepPerPulse); } 
@@ -202,9 +199,9 @@ void ardufocuser_command_function_ASPEED(){
         else if (aNumber<MINVEL) aNumber=MINVEL;
     	else{ speed = aNumber; }
 		str_speed=String(speed);
-
-		// TODO: SET SPEED moto.setSpeed....
-		// hadToReadspeed=false, para no hacer caso a los potenciometros
+		hadToReadspeed=false;
+		motor.setMaxSpeed(speed);
+ 
 	}
 
 	else{ str_speed=String(speed);} 
@@ -234,6 +231,8 @@ void ardufocuser_command_function_AACC(void){
 		str_aceleration=String(aceleration);
 
 		motor.setAcceleration(aceleration);
+
+
 		//TODO: SET SPEED moto.setSpeed....
 	}
 
@@ -360,7 +359,6 @@ void ardufocuser_command_function_ASLIMIT(){
 }
 
 
-
 // Ajusta limite software A.
 void ardufocuser_command_function_ASILIMIT(){
 	char charBuf[50];
@@ -410,7 +408,6 @@ void ardufocuser_command_function_ASOLIMIT(){
 	str_cmd.toCharArray(charBuf, 50); 
 	Serial.println(str_cmd); 
 }
-
 
 
 // Modifica brillo de la pantalla LCD

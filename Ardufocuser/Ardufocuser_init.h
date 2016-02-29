@@ -59,16 +59,14 @@ int mode = 1;
 ///////////////////////////////////////////////////////////////////////////////////
 // Tiempos del último refesco.
 /////////////////////////////////////////////////////////////////////////////////////
-
-
 unsigned long lastTimeReadManualController=0;
 int manual_controller_refresh_rate=250;
 
 unsigned long lastTimeUpdateLCD=0;
-int lcd_refresh_rate=250;
+int lcd_refresh_rate=100;
 
 unsigned long lastTimeCheckChangeTemp=0;
-int temp_refresh_rate=250;
+int temp_refresh_rate=100;
 
 
 unsigned long lastTimeComunicatePosition=0;
@@ -76,16 +74,16 @@ int current_position_refresh_rate=250;
 
 
 int lastPulse=btnSELECT;
-
 unsigned long lastTimeUpdate=0;
 
 // Intervalo de refresco 1 segundo.
 int refresh_rate=1000;
 
-
 // Variables auxiliares.
 int lastspeed = 0;
 int laststepPerPulse = 0;
+
+
 bool hadToReadspeed=true;
 bool hadToReadstepPerPulse=true;
 
