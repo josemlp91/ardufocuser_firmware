@@ -18,9 +18,8 @@
 
 #include "Ardufocuser_config.h"
 #include "Ardufocuser_init.h"
-#include "Ardufocuser_cmd.h"
 #include "Ardufocuser_utils.h"
-
+#include "Ardufocuser_cmd.h"
 
 /*
 * Bucle principal interrupción software.
@@ -28,6 +27,7 @@
 void timerFunction() {
 
 	position=motor.currentPosition();
+
 	if (position == limitRunSoftwareA) {
 		// Solo permitirmos movimiento en el sentido opuesto al límite.
 		if (motor.targetPosition() > limitRunSoftwareA)
@@ -46,7 +46,10 @@ void timerFunction() {
 	}
 
 	// Si no se cumple ninguna condición permitir girar libremente.
-	else {motor.run(); position=motor.currentPosition();}
+	else {motor.run(); position=motor.currentPosition(); }
+
+	// Comunicar posicion.
+    comunicate_current_position();
 
 	// DEBUG:
 	//motor.run(); position=motor.currentPosition();
@@ -54,7 +57,7 @@ void timerFunction() {
 
 
 /*
-* Rutinas que actualiza los controles manuale.
+* Rutinas que actualiza los controles manuales.
 */
 void read_manual_controller(){
 
@@ -66,13 +69,11 @@ void read_manual_controller(){
 
      // Cuando bajoamos el potenciometro al valor 0 forzamos a actualizar la velocidad.
      // Esto se hace así para contemplar la posibilidad de que se esten modificando los valores de forma remota.
-     
      if (potA==0) hadToReadspeed=true;
      if (hadToReadspeed){ speed = map(potA, 0, 1024, MINVEL, MAXVEL ); motor.setMaxSpeed(speed); }
 
      // Cuando bajamos el potenciometro al valor 0 forzamos a actualizar los pasos por pulso.
      // Esto se hace así para contemplar la posibilidad de que se esten modificando los valores de forma remota.
-    
      if (potB==0) hadToReadstepPerPulse=true;
      if (hadToReadstepPerPulse){ stepPerPulse = map(potB, 0, 1024, 1, MAXSTEPPXPULSA); }
 
@@ -137,13 +138,13 @@ void update_lcd_display(){
 bool is_change_thermal_optical(){
 	// Si cumple el tiempo minimo de refresco.
 	if (millis() > lastTimeCheckChangeTemp) {
-
 		if ((temperature>temp_perform+MAX_CHANGE_TEMP) || (temperature<temp_perform-MAX_CHANGE_TEMP)){ return true; }
 		else { return false; }
 	lastTimeCheckChangeTemp = millis() + temp_refresh_rate;
 
 	}else{ return false; }
 }
+
 
 // Activa led de aviso.
 void enable_warning() { digitalWrite(PINLED_WARNING,HIGH); }
@@ -169,40 +170,42 @@ void comunicate_current_position(){
 // Controlador WiiNunckuck para Ardufocuser
 void nunckuck_controller(){
 
-  chuck.update();
-  if (chuck.rightJoy()){
-    if (chuck.zPressed()){
-      motor.moveTo(limitRunSoftwareB);
-    }
+	// Solo utilizar nunchuck en modo manual. (por defecto)
+	if (mode==ONLY_MANUAL){
+		  chuck.update();
+		  if (chuck.rightJoy()){
+		    if (chuck.zPressed()){
+		      motor.moveTo(limitRunSoftwareB);
+		    }
 
-    else if (lastPulse!=btnDOWN){
-          motor.moveTo(motor.currentPosition() + stepPerPulse);
-    }
-      lastPulse=btnDOWN;
-  }
+		    else if (lastPulse!=btnDOWN){
+		          motor.moveTo(motor.currentPosition() + stepPerPulse);
+		    }
+		      lastPulse=btnDOWN;
+		  }
 
-   else if  (chuck.leftJoy()){
-     if (chuck.zPressed()){
-        motor.moveTo(limitRunSoftwareA);
-      }
+		   else if  (chuck.leftJoy()){
+		     if (chuck.zPressed()){
+		        motor.moveTo(limitRunSoftwareA);
+		      }
 
-      else if (lastPulse!=btnUP){
-        motor.moveTo(motor.currentPosition() - stepPerPulse);
-      }
-        lastPulse=btnUP;
-   }
+		      else if (lastPulse!=btnUP){
+		        motor.moveTo(motor.currentPosition() - stepPerPulse);
+		      }
+		        lastPulse=btnUP;
+		   }
 
-   else  {
-    lastPulse=btnNONE;
-    motor.moveTo(motor.currentPosition());
-   }
+		   else  {
+		    lastPulse=btnNONE;
+		    motor.moveTo(motor.currentPosition());
+		   }
 
-   // Hack para cambiar a modo remoto.
-   if (chuck.cPressed() && chuck.zPressed()){
-   		mode=ARDUFOCUS_MODE;
-		Serial.println("AMODE?1"); 
-   }
-
+		   // Hack para cambiar a modo remoto.
+		   if (chuck.cPressed() && chuck.zPressed()){
+		   		mode=ARDUFOCUS_MODE;
+				Serial.println("AMODE?1"); 
+		   }
+	}
 }
 
 
@@ -218,14 +221,13 @@ void welcome(char* msg)
 
 void save_current_session(){
 
-
- if (millis() > lastTimeSaveSession) {
-	save_session();   
-  	lastTimeSaveSession = millis() + save_sesion_refresh_rate;
-  }
-
+	// Si el motor se mueve, prorrogamos momento de guardado.
+	if (motor.distanceToGo() != 0) {lastTimeSaveSession=millis() + save_sesion_refresh_rate;}
+	if (millis() > lastTimeSaveSession) {
+		save_session(); // Dentro controlamos que no se hagan guardados de la misma información.
+	  	lastTimeSaveSession = millis() + save_sesion_refresh_rate;
+	  }
 }
-
 
 
 void setup()
@@ -255,6 +257,7 @@ void setup()
   Timer1.initialize(50);
   Timer1.attachInterrupt( timerFunction );
   
+  // Registramos comandos serie.
   registerCommand();
  
 }
@@ -262,14 +265,13 @@ void setup()
 
 void loop()
 {
+
   	serial_cmd.readSerial();
+  	
   	read_manual_controller();
   	update_lcd_display();
-  	//comunicate_current_position();
-  	//if (mode==ONLY_MANUAL){
-  		nunckuck_controller();
-  	//}
-  		save_current_session();
+  	nunckuck_controller();
+  	save_current_session();
 }
 
 

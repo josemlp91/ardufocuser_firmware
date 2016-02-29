@@ -98,7 +98,7 @@ int current_position_refresh_rate=250;
 
 
 unsigned long lastTimeSaveSession=0;
-int save_sesion_refresh_rate=1000;
+int save_sesion_refresh_rate=1000 * 10 * 1; // Cada 1/2 minuto.
 
 
 int lastPulse=btnSELECT;
@@ -115,34 +115,3 @@ bool hadToReadspeed=true;
 bool hadToReadstepPerPulse=true;
 //////////////////////////////////////////////////////////////////////////////////////////7
 
-void save_session()
-{
-	// Cargamos las veriables en la estructura session
-	rec_config.speed = speed;
-	rec_config.stepPerPulse = stepPerPulse ;
-	rec_config.position = position;
-	rec_config.temperature = 30;
-	rec_config.aceleration = aceleration;
-	rec_config.microStep = microStep;
-	rec_config.lcd_lux_status = lcd_lux_status;
-	rec_config.mode = mode;
-
-	EEPROM.writeBlock(EEPROM_SESSION_ADDRESS, rec_config);
- 
-}
-
-void load_session(){
-
-	// Cargamos sesion anterior.
-	EEPROM.readBlock(EEPROM_SESSION_ADDRESS, rec_config);
-
-	speed=rec_config.speed;
-	stepPerPulse=rec_config.stepPerPulse;
-	position=rec_config.position;
-	temperature=rec_config.temperature;
-	aceleration=rec_config.aceleration;
-	microStep=rec_config.microStep;
-	lcd_lux_status=rec_config.lcd_lux_status;
-	mode=rec_config.mode;
-
-}

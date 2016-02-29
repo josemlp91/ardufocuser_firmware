@@ -26,14 +26,6 @@
 #define ALCDPRINT   	       22    // Imprime mensaje en lcd
 
 
-// Set  high o low en pines correspondientes a ...............................................................................................................//(MS1, MS2, MS3)
-void setMicroFullStep()     { digitalWrite(PINMICROSTEP_MS1,LOW);   digitalWrite(PINMICROSTEP_MS2,LOW);   digitalWrite(PINMICROSTEP_MS3,LOW);  microStep=1; } //( 0,   0,   0 )
-void setMicroHalfStep()     { digitalWrite(PINMICROSTEP_MS1,HIGH);  digitalWrite(PINMICROSTEP_MS2,LOW);   digitalWrite(PINMICROSTEP_MS3,LOW);  microStep=2; } //( 1,   0,   0 )
-void setMicroQuarterStep()  { digitalWrite(PINMICROSTEP_MS1,LOW);   digitalWrite(PINMICROSTEP_MS2,HIGH);  digitalWrite(PINMICROSTEP_MS3,LOW);  microStep=3; } //( 0,   1,   0 )
-void setMicroEighthStep()   { digitalWrite(PINMICROSTEP_MS1,HIGH);  digitalWrite(PINMICROSTEP_MS2,HIGH);  digitalWrite(PINMICROSTEP_MS3,LOW);  microStep=4; } //( 1,   1,   0 )
-void setMicroSixteenthStep(){ digitalWrite(PINMICROSTEP_MS1,HIGH);  digitalWrite(PINMICROSTEP_MS2,HIGH);  digitalWrite(PINMICROSTEP_MS3,HIGH); microStep=5; } //( 1,   1,   1 )
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 // Ajusta modo autofocus.
 void ardufocuser_command_function_AINIT()
 {
@@ -254,6 +246,7 @@ void ardufocuser_command_function_AR(){
   if (arg != NULL) {
     aNumber = atoi(arg);
     position=aNumber;
+    motor.setCurrentPosition(position);
     str_position = String(position);
   }
 
@@ -296,7 +289,6 @@ void ardufocuser_command_function_AMOV(){
 
 }
 
-
 // Realiza configuración de micropasos, diviendo cada paso en la mitad, cuarto, octava o dieciseisava.
 void ardufocuser_command_function_AMICRO(){
 
@@ -310,30 +302,7 @@ void ardufocuser_command_function_AMICRO(){
 
 	if (arg != NULL) {
 		Imicro = atoi(arg);		
-			switch (Imicro) {
-
-			    case 1:
-			     	setMicroFullStep();
-			      	break;
-			    case 2:
-			      	setMicroHalfStep();
-			      	break;
-			    case 3:
-			      	setMicroQuarterStep();
-			      	break;
-			    case 4:
-			      	setMicroEighthStep();
-			      	break;
-			    case 5:
-			      	setMicroSixteenthStep();
-			    	break;
-
-			    default:
-				 	setMicroSixteenthStep();
-			    break;
-
-		  }
-
+		setMicro(Imicro);
 	}
  
     str_micro_step=String(microStep);

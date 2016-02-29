@@ -71,5 +71,3 @@ const int btnLEFT=3;
 const int btnSELECT=4;
 const int btnNONE=5;
 
-// Tabla para hacer persistentes los datos de la sesion.
-#define SESION_TBL 1
