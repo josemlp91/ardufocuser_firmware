@@ -1,10 +1,7 @@
 //Definimos los indices de cada comando.
 
-// Instancia de SerialCommand, tokenizador y parseador de puerto serie.
-SerialCommand serial_cmd; 
-
-
-// Esto ya no es necesario.
+// Esto ya no es necesario, pero lo dejo a modo de documentación.
+// 
 #define AINIT   				0    // Iniciar modo funcionamiento Ardufocuser.
 #define AMODE   				1    // Estableceer modo de funcionamiento.
 #define AG   		  			2    // Mover enfocador hasta posición pasada como dato.

@@ -40,14 +40,10 @@
 #define PINMICROSTEP_MS3 13
 
 // Direccion de escritura en memoria  eeprom
-# define EEPROM_DIR_POSITION 20
-# define EEPROM_DIR_SPEED 30
-# define EEPROM_DIR_STEEP 40
-# define EEPROM_DIR_MICRO 50
+# define EEPROM_SESSION_ADDRESS 20  // Es un  valor arbitrario, (Arduino UNO 512 bytes de EEPROM)
 
 // analogic
 // I2C
-
 #define PIN_TEMSENSOR A1
 #define PIN_POTA A2
 #define PIN_POTB A3
@@ -61,7 +57,7 @@
 # define LCD_ROWS 2
 # define LCD_COLUMNS 16
 
-
+// Constantes para los modos de funcionamiento.
 # define ARDUFOCUS_MODE 1
 # define ROBOFOCUS_MODE 2
 # define ONLY_MANUAL 3
@@ -74,3 +70,6 @@ const int btnDOWN=2;
 const int btnLEFT=3;
 const int btnSELECT=4;
 const int btnNONE=5;
+
+// Tabla para hacer persistentes los datos de la sesion.
+#define SESION_TBL 1

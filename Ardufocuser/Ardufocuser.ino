@@ -3,15 +3,18 @@
 #define DEBUG 0
 #define ENABLE_LCD 1
 
+#include "Arduino.h"
 #include <TimerOne.h>
 #include <LiquidCrystal_I2C.h>
 #include <SerialCommand.h>
 #include <AccelStepper.h>
+#include <string.h>
 
 #include <Wire.h>
 #include <math.h>
 #include <nunchuck.h>
-#include <EEPROM.h>
+#include <EEPROMVar.h>
+#include <EEPROMex.h>
 
 #include "Ardufocuser_config.h"
 #include "Ardufocuser_init.h"
@@ -213,6 +216,16 @@ void welcome(char* msg)
   lcd.clear();
 }
 
+void save_current_session(){
+
+
+ if (millis() > lastTimeSaveSession) {
+	save_session();   
+  	lastTimeSaveSession = millis() + save_sesion_refresh_rate;
+  }
+
+}
+
 
 
 void setup()
@@ -235,6 +248,9 @@ void setup()
   chuck.begin();
   chuck.update();
 
+  // Actualizamos con datos sesion anterior.
+  load_session();
+
   // iniciamos interrupciones software.
   Timer1.initialize(50);
   Timer1.attachInterrupt( timerFunction );
@@ -250,10 +266,10 @@ void loop()
   	read_manual_controller();
   	update_lcd_display();
   	//comunicate_current_position();
-  	if (mode==ONLY_MANUAL){
+  	//if (mode==ONLY_MANUAL){
   		nunckuck_controller();
-  	}
-
+  	//}
+  		save_current_session();
 }
 
 
