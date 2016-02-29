@@ -194,7 +194,8 @@ void nunckuck_controller(){
     motor.moveTo(motor.currentPosition());
    }
 
-   if (chuck.cPressed()){
+   // Hack para cambiar a modo remoto.
+   if (chuck.cPressed() && chuck.zPressed()){
    		mode=ARDUFOCUS_MODE;
 		Serial.println("AMODE?1"); 
    }
