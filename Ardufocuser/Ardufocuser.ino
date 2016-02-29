@@ -19,8 +19,6 @@
 #include "Ardufocuser_utils.h"
 
 
-int count=0;
-
 /*
 * Bucle principal interrupción software.
 */
@@ -196,6 +194,11 @@ void nunckuck_controller(){
     motor.moveTo(motor.currentPosition());
    }
 
+   if (chuck.cPressed()){
+   		mode=ARDUFOCUS_MODE;
+		Serial.println("AMODE?1"); 
+   }
+
 }
 
 
@@ -214,7 +217,7 @@ void welcome(char* msg)
 void setup()
 {
 
-  Serial.begin(9600);
+  Serial.begin(4800);
   
   // iniciamos lcd
   lcd.begin();
@@ -246,7 +249,9 @@ void loop()
   	read_manual_controller();
   	update_lcd_display();
   	//comunicate_current_position();
-  	//nunckuck_controller();
+  	if (mode==ONLY_MANUAL){
+  		nunckuck_controller();
+  	}
 
 }
 

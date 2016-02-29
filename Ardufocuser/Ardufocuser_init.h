@@ -54,7 +54,7 @@ int button=btnNONE;
 
 
 // Modo de funcionamiento.
-int mode = 1;
+int mode = ONLY_MANUAL;
 
 ///////////////////////////////////////////////////////////////////////////////////
 // Tiempos del último refesco.
