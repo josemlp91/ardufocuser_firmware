@@ -29,27 +29,31 @@ void timerFunction() {
 	position=motor.currentPosition();
 
 	if (position == limitRunSoftwareA) {
+		comunicate_software_limit();
+
 		// Solo permitirmos movimiento en el sentido opuesto al límite.
 		if (motor.targetPosition() > limitRunSoftwareA)
-			{ motor.run(); limitRunSoftwareActiveA=false;  position=motor.currentPosition();}
+			{ motor.run(); limitRunSoftwareActiveA=false;  position=motor.currentPosition(); comunicate_motor_run(); }
 		else
 			{  motor.moveTo(limitRunSoftwareA);  limitRunSoftwareActiveA=true;}
 	}
 
 	if (position == limitRunSoftwareB) {
+		comunicate_software_limit();
 		// Solo permitirmos movimiento en el sentido opuesto al límite.
 		if (motor.targetPosition() < limitRunSoftwareB)
-			{ motor.run(); limitRunSoftwareActiveB=false;  position=motor.currentPosition(); }
+			{ motor.run(); limitRunSoftwareActiveB=false;  position=motor.currentPosition(); comunicate_motor_run(); }
 
 		else
 			{ motor.moveTo(limitRunSoftwareB);   limitRunSoftwareActiveB=true; }
 	}
 
 	// Si no se cumple ninguna condición permitir girar libremente.
-	else {motor.run(); position=motor.currentPosition(); }
+	else {motor.run(); position=motor.currentPosition(); comunicate_motor_run(); }
 
 	// Comunicar posicion.
     comunicate_current_position();
+    comunicate_current_temperature();
 
 	// DEBUG:
 	//motor.run(); position=motor.currentPosition();
@@ -69,12 +73,12 @@ void read_manual_controller(){
 
      // Cuando bajoamos el potenciometro al valor 0 forzamos a actualizar la velocidad.
      // Esto se hace así para contemplar la posibilidad de que se esten modificando los valores de forma remota.
-     if (potA==0) hadToReadspeed=true;
+     if (potA==0) { hadToReadspeed=true; }
      if (hadToReadspeed){ speed = map(potA, 0, 1024, MINVEL, MAXVEL ); motor.setMaxSpeed(speed); }
 
      // Cuando bajamos el potenciometro al valor 0 forzamos a actualizar los pasos por pulso.
      // Esto se hace así para contemplar la posibilidad de que se esten modificando los valores de forma remota.
-     if (potB==0) hadToReadstepPerPulse=true;
+     if (potB==0) { hadToReadstepPerPulse=true; }
      if (hadToReadstepPerPulse){ stepPerPulse = map(potB, 0, 1024, 1, MAXSTEPPXPULSA); }
 
      lastTimeReadManualController = millis() + manual_controller_refresh_rate;
@@ -167,6 +171,41 @@ void comunicate_current_position(){
 }
 
 
+// Comunica en tiempo real la posicion exacta del motor (ojo del motor).
+void comunicate_current_temperature(){
+
+  if (millis() > lastTimeComunicateTemperature) {
+
+    int mock_temperature = random(-10, 40);
+    String str_mock_temperature(mock_temperature);
+    Serial.println("ATEMP?"+ str_mock_temperature);
+
+    
+  	lastTimeComunicateTemperature = millis() + current_temperature_refresh_rate;
+  }
+
+}
+
+// Comunica en tiempo real la posicion exacta del motor (ojo del motor).
+void comunicate_software_limit(){
+	
+  	if (millis() > lastTimeComunicateSLimit) {
+    	Serial.println("ASLIMIT?");
+  		lastTimeComunicateSLimit = millis() + current_s_limit_refresh_rate;
+  }
+
+}
+
+void comunicate_motor_run(){
+
+	if (millis() > lastTimeComunicateRun) {
+    	Serial.println("ARUN?");
+  		lastTimeComunicateRun = millis() + current_run_refresh_rate;
+  }
+}
+
+
+
 // Controlador WiiNunckuck para Ardufocuser
 void nunckuck_controller(){
 
@@ -233,7 +272,7 @@ void save_current_session(){
 void setup()
 {
 
-  Serial.begin(4800);
+  Serial.begin(9600);
   
   // iniciamos lcd
   lcd.begin();
@@ -271,7 +310,7 @@ void loop()
   	read_manual_controller();
   	update_lcd_display();
   	nunckuck_controller();
-  	save_current_session();
+  	//save_current_session();
 }
 
 

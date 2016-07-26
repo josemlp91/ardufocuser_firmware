@@ -106,11 +106,12 @@ void ardufocuser_command_function_AG()
 		
 		aNumber = atoi(arg);
 		position = aNumber;
+                motor.moveTo(position);
 		str_position = String(position);	
 	}
 
 	else{ str_position = String(position); }
-
+        
 	str_cmd = String("AG?" + str_position);
 	str_cmd.toCharArray(charBuf, 50); 
 	Serial.println(str_cmd); 
@@ -312,68 +313,30 @@ void ardufocuser_command_function_AMICRO(){
 
 
 
-// Consuta limistes software
 void ardufocuser_command_function_ASLIMIT(){
-	char charBuf[50];
-	String str_cmd;
-	String str_slimitA=String(limitRunSoftwareActiveA);
-	String str_slimitB=String(limitRunSoftwareActiveB);
-	
-	str_cmd = String("ASLIMIT?" + str_slimitA + "-" + str_slimitB );
-	str_cmd.toCharArray(charBuf, 50); 
-	Serial.println(str_cmd); 
-}
+  char charBuf[50];
+  String str_silimit;
+  String str_cmd;
+  int aNumber;
+  char *arg;  
 
-
-// Ajusta limite software A.
-void ardufocuser_command_function_ASILIMIT(){
-	char charBuf[50];
-	String str_silimit;
-	String str_cmd;
-	int aNumber;
-	char *arg;  
-
-	arg = serial_cmd.next();
+  arg = serial_cmd.next();
 
   if (arg != NULL) {
     aNumber = atoi(arg);
     limitRunSoftwareA=aNumber;
+    limitRunSoftwareB=aNumber * -1;
     str_silimit = String(limitRunSoftwareA);
   }
 
   else {
      str_silimit = String(limitRunSoftwareA);
   }
-  	str_cmd = String("ASILIMIT?" + str_silimit );
-	str_cmd.toCharArray(charBuf, 50); 
-	Serial.println(str_cmd); 
+    str_cmd = String("ASLIMIT?" + str_silimit );
+  str_cmd.toCharArray(charBuf, 50); 
+  Serial.println(str_cmd); 
 }
 
-// Ajusta limite software B.
-void ardufocuser_command_function_ASOLIMIT(){
-
-	char charBuf[50];
-	String str_solimit;
-	String str_cmd;
-	int aNumber;
-	char *arg;  
-
-	arg = serial_cmd.next();
-
-  if (arg != NULL) {
-    aNumber = atoi(arg);
-    limitRunSoftwareB=aNumber;
-    str_solimit = String(limitRunSoftwareB);
-  }
-
-  else {
-     str_solimit = String(limitRunSoftwareB);
-  }
-
-  	str_cmd = String("ASOLIMIT?" + str_solimit );
-	str_cmd.toCharArray(charBuf, 50); 
-	Serial.println(str_cmd); 
-}
 
 
 // Modifica brillo de la pantalla LCD
@@ -384,19 +347,11 @@ void ardufocuser_command_function_ALUX(){
 	char charBuf[50];
 	String str_lux;
 	String str_cmd;
-	int aNumber;
-	char *arg;  
+ 		
+	lcd_lux_status=!lcd_lux_status;
 
-	arg = serial_cmd.next();
-
-	if (arg != NULL) {
-		aNumber = atoi(arg);
-		lcd_lux_status=aNumber;
-
-		// TODO: TEST
-		lcd.setBacklight(lcd_lux_status);
-	}
-
+	lcd.setBacklight(lcd_lux_status);
+	
     str_lux = String(lcd_lux_status);
   	str_cmd = String("ALUX?" + str_lux);
 	str_cmd.toCharArray(charBuf, 50); 
@@ -467,8 +422,8 @@ void registerCommand(){
   serial_cmd.addCommand("AR", ardufocuser_command_function_AR);
   serial_cmd.addCommand("AHLIMIT", ardufocuser_command_function_AHLIMIT);
   serial_cmd.addCommand("ASLIMIT", ardufocuser_command_function_ASLIMIT);
-  serial_cmd.addCommand("ASILIMIT", ardufocuser_command_function_ASILIMIT);
-  serial_cmd.addCommand("ASOLIMIT", ardufocuser_command_function_ASOLIMIT);
+  //serial_cmd.addCommand("ASILIMIT", ardufocuser_command_function_ASILIMIT);
+  //serial_cmd.addCommand("ASOLIMIT", ardufocuser_command_function_ASOLIMIT);
   serial_cmd.addCommand("AVERS", ardufocuser_command_function_AVERS);
   serial_cmd.addCommand("ARUNA", ardufocuser_command_function_ARUNA);
   serial_cmd.addCommand("ARUNB", ardufocuser_command_function_ARUNB);
