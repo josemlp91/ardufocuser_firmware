@@ -209,8 +209,6 @@ void comunicate_motor_run(){
 // Controlador WiiNunckuck para Ardufocuser
 void nunckuck_controller(){
 
-	// Solo utilizar nunchuck en modo manual. (por defecto)
-	if (mode==ONLY_MANUAL){
 		  chuck.update();
 		  if (chuck.rightJoy()){
 		    if (chuck.zPressed()){
@@ -221,6 +219,7 @@ void nunckuck_controller(){
 		          motor.moveTo(motor.currentPosition() + stepPerPulse);
 		    }
 		      lastPulse=btnDOWN;
+		      lastTimeReadNunchuckLimit = millis() + nunchuck_refresh_rate;
 		  }
 
 		   else if  (chuck.leftJoy()){
@@ -232,19 +231,23 @@ void nunckuck_controller(){
 		        motor.moveTo(motor.currentPosition() - stepPerPulse);
 		      }
 		        lastPulse=btnUP;
+		        lastTimeReadNunchuckLimit = millis() + nunchuck_refresh_rate;
 		   }
 
 		   else  {
-		    lastPulse=btnNONE;
-		    motor.moveTo(motor.currentPosition());
+			    lastPulse=btnNONE;
+			    if (lastTimeReadNunchuckLimit >= millis()) {
+	                motor.moveTo(motor.currentPosition()); 
+	            }
+
 		   }
 
-		   // Hack para cambiar a modo remoto.
-		   if (chuck.cPressed() && chuck.zPressed()){
-		   		mode=ARDUFOCUS_MODE;
-				Serial.println("AMODE?1"); 
-		   }
-	}
+		   // Parada de seguridad
+		  if (chuck.cPressed()){
+                 motor.moveTo(motor.currentPosition()); 
+
+		}
+	
 }
 
 

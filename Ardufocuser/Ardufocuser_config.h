@@ -45,8 +45,8 @@
 // analogic
 // I2C
 #define PIN_TEMSENSOR A3
-#define PIN_POTA A1
-#define PIN_POTB A2
+#define PIN_POTA A0
+#define PIN_POTB A1
 
 // Se asume dado la arquitectura de la placa.
 #define PIN_I2C_SDA A4

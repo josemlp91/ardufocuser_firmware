@@ -102,6 +102,9 @@ int current_temperature_refresh_rate=1000;
 unsigned long lastTimeComunicateSLimit=0;
 int current_s_limit_refresh_rate=1000;
 
+unsigned long lastTimeReadNunchuckLimit=0;
+int nunchuck_refresh_rate=500;
+
 
 unsigned long lastTimeComunicateRun=0;
 int current_run_refresh_rate=2000;
