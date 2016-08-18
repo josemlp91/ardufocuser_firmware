@@ -190,7 +190,7 @@ void ardufocuser_command_function_ASPEED(){
     	else{ speed = aNumber; }
 		str_speed=String(speed);
 		hadToReadspeed=false;
-		motor.setMaxSpeed(speed);
+		motor.setMaxSpeed(speed * 10);
  
 	}
 

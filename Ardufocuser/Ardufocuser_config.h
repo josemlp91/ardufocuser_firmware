@@ -2,7 +2,7 @@
 // DEFAULT VALUES.
 
 // Máximo valor para el control de pasos por pulso.
-#define MAXSTEPPXPULSA   100
+#define MAXSTEPPXPULSA   51
 
 // Máximo valor para el control de la velocidad de giro del motor.
 #define MAXVEL   500
@@ -44,7 +44,7 @@
 
 // analogic
 // I2C
-#define PIN_TEMSENSOR A3
+#define PIN_TEMSENSOR A2
 #define PIN_POTA A0
 #define PIN_POTB A1
 

@@ -65,6 +65,9 @@ void timerFunction() {
 */
 void read_manual_controller(){
 
+	int speed_step;
+	int step_step;
+
   // Si cumple el tiempo minimo de refresco.
   if (millis() > lastTimeReadManualController) {
 
@@ -73,16 +76,27 @@ void read_manual_controller(){
 
      // Cuando bajoamos el potenciometro al valor 0 forzamos a actualizar la velocidad.
      // Esto se hace así para contemplar la posibilidad de que se esten modificando los valores de forma remota.
-     if (potA==0) { hadToReadspeed=true; }
-     if (hadToReadspeed){ speed = map(potA, 0, 1024, MINVEL, MAXVEL ); motor.setMaxSpeed(speed); }
+     if (potA<=10) { hadToReadspeed=true; }
+     
+     if (hadToReadspeed){
+     	speed = map(potA, 0, 1024, MINVEL, MAXVEL);
+     	speed = map(speed, MINVEL, MAXVEL, 0, 21);
+     	motor.setMaxSpeed(speed * 10);
+     }
 
      // Cuando bajamos el potenciometro al valor 0 forzamos a actualizar los pasos por pulso.
      // Esto se hace así para contemplar la posibilidad de que se esten modificando los valores de forma remota.
-     if (potB==0) { hadToReadstepPerPulse=true; }
-     if (hadToReadstepPerPulse){ stepPerPulse = map(potB, 0, 1024, 1, MAXSTEPPXPULSA); }
+     if (potB<=10) { hadToReadstepPerPulse=true;  }
+     
+     if (hadToReadstepPerPulse){ 
+     	stepPerPulse = map(potB, 0, 1024, 1, MAXSTEPPXPULSA );
+     }
+   
+   lastTimeReadManualController = millis() + manual_controller_refresh_rate; 
 
-     lastTimeReadManualController = millis() + manual_controller_refresh_rate;
-    }
+   }
+
+    
 }
 
 // Refresca LCD
@@ -109,28 +123,39 @@ void update_lcd_display(){
     }
 
 	// Actualizamos zona de la temperatura
-	lcd.setCursor(0,0);
-	lcd.print("TEMP:   ");
-	lcd.setCursor(5,0);
-	lcd.print(temperature);
+	if (temperature!=last_temperature_displayed){
+		lcd.setCursor(0,0);
+		lcd.print("TEMP:   ");
+		lcd.setCursor(5,0);
+		lcd.print(temperature);
+		last_temperature_displayed = temperature;
+	}
 
-	lcd.setCursor(8,1);
-	lcd.print("SP:    ");
-	lcd.setCursor(12,1);
-	lcd.print(speed);
+	if (speed!=last_speed_displayed){
+		lcd.setCursor(8,1);
+		lcd.print("SP:    ");
+		lcd.setCursor(12,1);
+		lcd.print(speed);
+		last_speed_displayed = speed;
+	}
 
-
-	lcd.setCursor(0,1);
-	lcd.print("ST:   ");
-	lcd.setCursor(3,1);
-	lcd.print(stepPerPulse);
-
-
-	lcd.setCursor(8,0);
-	lcd.print("POS:    ");
-	lcd.setCursor(12,0);
-	lcd.print(position);
-	
+	// Dado que comparten el mismo lugar en la pantalla LCD.
+	if (button == btnNONE){
+		if (stepPerPulse != last_steep_per_pulse_displayed){
+			lcd.setCursor(0,1);
+			lcd.print("ST:   ");
+			lcd.setCursor(3,1);
+			lcd.print(stepPerPulse);
+			last_steep_per_pulse_displayed = stepPerPulse;
+		}
+	}
+	if (position!=last_position_displayed){
+		lcd.setCursor(8,0);
+		lcd.print("POS:    ");
+		lcd.setCursor(12,0);
+		lcd.print(position);
+		last_position_displayed = position;
+	}
 	// Refrescamos momento de actualizacion.
 	lastTimeUpdateLCD = millis() + lcd_refresh_rate;
 
@@ -175,10 +200,9 @@ void comunicate_current_position(){
 void comunicate_current_temperature(){
 
   if (millis() > lastTimeComunicateTemperature) {
-
-    int mock_temperature = random(-10, 40);
-    String str_mock_temperature(mock_temperature);
-    Serial.println("ATEMP?"+ str_mock_temperature);
+    //int mock_temperature = random(-10, 40);
+    String str_temperature(temperature);
+    Serial.println("ATEMP?"+ str_temperature);
 
     
   	lastTimeComunicateTemperature = millis() + current_temperature_refresh_rate;
@@ -204,6 +228,13 @@ void comunicate_motor_run(){
   }
 }
 
+void temperature_read(){
+	if (millis() > lastTimeReadTemp) {
+		temperature = analogRead(PIN_TEMSENSOR);
+		temperature = (5.0 * temperature * 100.0)/1024.0;
+		lastTimeReadTemp = millis() + temp_refresh;
+	}
+}
 
 
 // Controlador WiiNunckuck para Ardufocuser
@@ -216,8 +247,9 @@ void nunckuck_controller(){
 		    }
 
 		    else if (lastPulse!=btnDOWN){
-		          motor.moveTo(motor.currentPosition() + stepPerPulse);
+				motor.moveTo(motor.currentPosition() + stepPerPulse);
 		    }
+		      button=btnRIGHT;
 		      lastPulse=btnDOWN;
 		      lastTimeReadNunchuckLimit = millis() + nunchuck_refresh_rate;
 		  }
@@ -230,11 +262,14 @@ void nunckuck_controller(){
 		      else if (lastPulse!=btnUP){
 		        motor.moveTo(motor.currentPosition() - stepPerPulse);
 		      }
+
+		        button=btnLEFT;
 		        lastPulse=btnUP;
 		        lastTimeReadNunchuckLimit = millis() + nunchuck_refresh_rate;
 		   }
 
 		   else  {
+		   	    button=btnNONE;
 			    lastPulse=btnNONE;
 			    if (lastTimeReadNunchuckLimit >= millis()) {
 	                motor.moveTo(motor.currentPosition()); 
@@ -311,6 +346,7 @@ void loop()
   	serial_cmd.readSerial();
   	
   	read_manual_controller();
+  	temperature_read();
   	update_lcd_display();
   	nunckuck_controller();
   	//save_current_session();

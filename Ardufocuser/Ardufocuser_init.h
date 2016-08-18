@@ -87,6 +87,9 @@ int mode = ONLY_MANUAL;
 unsigned long lastTimeReadManualController=0;
 int manual_controller_refresh_rate=250;
 
+unsigned long lastTimeReadTemp=0;
+int temp_refresh=1000;
+
 unsigned long lastTimeUpdateLCD=0;
 int lcd_refresh_rate=100;
 
@@ -105,14 +108,11 @@ int current_s_limit_refresh_rate=1000;
 unsigned long lastTimeReadNunchuckLimit=0;
 int nunchuck_refresh_rate=500;
 
-
 unsigned long lastTimeComunicateRun=0;
 int current_run_refresh_rate=2000;
 
-
 unsigned long lastTimeSaveSession=0;
 int save_sesion_refresh_rate=1000 * 10 * 1; // Cada 1/2 minuto.
-
 
 int lastPulse=btnSELECT;
 unsigned long lastTimeUpdate=0;
@@ -121,6 +121,13 @@ unsigned long lastTimeUpdate=0;
 int refresh_rate=1000;
 
 // Variables auxiliares.
+
+int last_temperature_displayed;
+int last_position_displayed; 
+int last_speed_displayed;
+int last_steep_per_pulse_displayed;
+
+
 int lastspeed = 0;
 int laststepPerPulse = 0;
 
