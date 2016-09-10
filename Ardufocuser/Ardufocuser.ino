@@ -1,4 +1,20 @@
-// Ayuda: >> cu -l /dev/ttyACM0  -s 9600
+
+/*
+    This file is part of Ardufocuser Project.
+
+    Ardufocuser is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Ardufocuser is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Ardufocuser.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #define DEBUG 0
 #define ENABLE_LCD 1
@@ -20,6 +36,8 @@
 #include "Ardufocuser_init.h"
 #include "Ardufocuser_utils.h"
 #include "Ardufocuser_cmd.h"
+
+// Ayuda: >> cu -l /dev/ttyACM0  -s 9600
 
 /*
 * Bucle principal interrupción software.
