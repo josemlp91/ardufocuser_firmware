@@ -12,7 +12,12 @@ install:
     - unzip AccelStepper-1.49.zip
     - wget https://github.com/josemlp91/ardufocuser_firmware/raw/master/Ardufocuser/libs/nunchuck.zip
     - unzip nunchuck.zip
+    - wget https://github.com/josemlp91/ardufocuser_firmware/raw/master/Ardufocuser/libs/SerialCommand.zip
+    - unzip SerialCommand.zip
+    - wget https://github.com/josemlp91/ardufocuser_firmware/raw/master/Ardufocuser/libs/EEPROME.zip
+    - unzip EEPROME.zip
+
 
 
 script:
-    - platformio ci Ardufocuser --lib="TimerOne" --lib="i2clcd" --lib="nunchuck" --lib="AccelStepper" --board=uno
+    - platformio ci Ardufocuser --lib="TimerOne" --lib="i2clcd" --lib="nunchuck" --lib="AccelStepper" --lib="SerialCommand" --lib="EEPROMVar" --lib="EEPROMex" --board=uno
