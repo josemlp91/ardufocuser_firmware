@@ -20,4 +20,4 @@ install:
 
 
 script:
-    - platformio ci Ardufocuser --lib="TimerOne" --lib="i2clcd" --lib="nunchuck" --lib="AccelStepper" --lib="SerialCommand" --lib="EEPROMVar" --lib="EEPROMex" --board=uno
+    - platformio ci Ardufocuser --lib="TimerOne" --lib="i2clcd" --lib="nunchuck" --lib="AccelStepper" --lib="SerialCommand" --lib="EEPROMEx" --board=uno
